@@ -4,6 +4,7 @@
 #include <iostream>
 #include "string"
 #include "typeEnums.h"
+#include "AidFunctions.h"
 
 typedef struct node {
 
@@ -67,7 +68,7 @@ class ScopeVal : public Node {
 class NumVal : public Node {
     int val;
     public:
-        NumVal(char * strNum) : val(2) {}
+        NumVal(char * strNum) : val(CharPointerToInt(strNum)) {}
 };
 
 class IdVal : public Node {
