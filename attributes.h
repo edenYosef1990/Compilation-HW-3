@@ -6,9 +6,12 @@
 #include "typeEnums.h"
 #include "AidFunctions.h"
 
-typedef struct node {
+class Node {
+    public:
+    Node(){}
+};
 
-} Node ;
+//======================================token's Classes=====================================//
 
 class Type : public Node {
     TypeNameEnum name;
@@ -82,6 +85,35 @@ class StrVal : public Node {
     public:
         StrVal(char * strVal) : str(strVal) {}
 };
+
+//======================================Non Terminals's Classes=====================================//
+
+class NonTermBool : public Node {
+    public:
+    NonTermBool(Node * node);
+    NonTermBool(Node * node1 , Node * node2);
+};
+
+class NonTermStr : public Node {
+    public:
+    NonTermStr(){}
+};
+
+class NonTermB : public Node {
+    public:
+    NonTermB(){}
+};
+
+class NonTermInt : public Node {
+    public:
+    NonTermInt(){}
+};
+
+class NonTermID : public Node {
+    public:
+    NonTermID(){}
+};
+
 
 #define YYSTYPE Node*
 

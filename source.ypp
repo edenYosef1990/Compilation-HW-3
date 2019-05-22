@@ -95,17 +95,52 @@ Type :
     INT | BYTE | BOOL
 ;
 Exp :
-    ID |
+    ID {
+        $$ = new NonTermID($1);
+    }|
     Call |
-    NUM |
-    NUM B |
-    STRING |
-    TRUE |
-    FALSE |
-	Exp AND Exp |
-    Exp OR Exp |
-    Exp RELOP Exp |
-    NOT Exp
+    NUM {$$ = new NonTermInt($1);} |
+    NUM B {
+        if(IsValidB($1))
+        {
+            $$ = new NonTermB($1);
+        }
+     } |
+    STRING {
+        $$ = new NonTermStr($1)
+        } |
+    TRUE {
+        $$ = new NonTermBool();
+        }|
+    FALSE {
+        $$ = new NonTermBool();
+        } |
+	Exp AND Exp {
+        if(IsValidBoolExp($1,$2,$3))
+        {
+            $$ = new NonTermBool($1,$2);
+        }   
+    } |
+    Exp OR Exp {
+        if(IsValidBoolExp($1,$2,$3))
+        {
+            $$ = new NonTermBool($1,$2);
+        }   
+    } |
+    Exp RELOP Exp {
+        if(IsValidBoolExp($1,$2,$3))
+        {
+            $$ = new NonTermBool($1,$2);
+        }   
+    } |
+    NOT Exp {
+        if(IsValidBoolExp($1))
+        {
+            $$ = new NonTermBool($1);
+        }   
+    } 
+
+    
 ;
 
 %%
