@@ -90,28 +90,30 @@ class StrVal : public Node {
 
 class NonTermBool : public Node {
     public:
+    NonTermBool();
     NonTermBool(Node * node);
     NonTermBool(Node * node1 , Node * node2);
 };
 
 class NonTermStr : public Node {
     public:
-    NonTermStr(){}
+    NonTermStr(Node * node);
 };
 
 class NonTermB : public Node {
     public:
-    NonTermB(){}
+    NonTermB();
+    NonTermB(Node * node);
 };
 
 class NonTermInt : public Node {
     public:
-    NonTermInt(){}
+    NonTermInt(Node * node);
 };
 
 class NonTermID : public Node {
     public:
-    NonTermID(){}
+    NonTermID(Node * node){}
 };
 
 
