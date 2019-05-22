@@ -8,11 +8,11 @@
 
 %%
 
-void        		        {yylval = new Type(TYPE_VOID); return VOID;}
+void        		    {yylval = new Type(TYPE_VOID); return VOID;}
 int         			{yylval = new Type(TYPE_INT); return INT;}
-b          			{yylval = new Type(TYPE_B); return B;}
-byte         		        {yylval = new Type(TYPE_BYTE); return BYTE;}
-bool                		{yylval = new Type(TYPE_BOOL); return BOOL;}
+b          				{yylval = new Type(TYPE_B); return B;}
+byte         		    {yylval = new Type(TYPE_BYTE); return BYTE;}
+bool                	{yylval = new Type(TYPE_BOOL); return BOOL;}
 and          			{yylval = new Op(OP_AND); return AND;}
 or          			{yylval = new Op(OP_OR); return OR;}
 not          			{yylval = new Op(OP_NOT); return NOT;}
@@ -25,7 +25,7 @@ while             		{yylval = new CmdWord(CMD_WHILE); return WHILE;}
 break             		{yylval = new CmdWord(CMD_BREAK); return BREAK;}
 continue          		{yylval = new CmdWord(CMD_CONTINUE); return CONTINUE;}
 \@pre              		{yylval = new CmdWord(CMD_PRECOND); return PRECOND;}
-\;         			{yylval = new CmdWord(CMD_SECTION); return SC;}
+\;         				{yylval = new CmdWord(CMD_SECTION); return SC;}
 \,          			{yylval = new CmdWord(CMD_COMMA); return COMMA;}
 \(          			{yylval = new ScopeVal(SCOPE_LPAREN); return LPAREN;}
 \)          			{yylval = new ScopeVal(SCOPE_RPAREN); return RPAREN;}
