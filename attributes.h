@@ -90,6 +90,8 @@ class StrVal : public Node {
 
 class NonTermBool : public Node {
     public:
+    static bool IsValidBoolExp(Node * node);
+    static bool IsValidBoolExp(Node * node1, Node * node2 , Node * node3);
     NonTermBool();
     NonTermBool(Node * node);
     NonTermBool(Node * node1 , Node * node2);
@@ -102,6 +104,7 @@ class NonTermStr : public Node {
 
 class NonTermB : public Node {
     public:
+    static bool IsValidB(Node * node1);
     NonTermB();
     NonTermB(Node * node);
 };
@@ -113,7 +116,7 @@ class NonTermInt : public Node {
 
 class NonTermID : public Node {
     public:
-    NonTermID(Node * node){}
+    NonTermID(Node * node);
 };
 
 

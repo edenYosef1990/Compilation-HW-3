@@ -6,7 +6,7 @@
 	using namespace std;
 
 	extern int yylex();
-	int yyerror(char * message);
+	int yyerror(char const*);
 %}
 
 %token VOID
@@ -101,13 +101,13 @@ Exp :
     Call |
     NUM {$$ = new NonTermInt($1);} |
     NUM B {
-        if(IsValidB($1))
+        if(NonTermB::IsValidB($1))
         {
             $$ = new NonTermB($1);
         }
      } |
     STRING {
-        $$ = new NonTermStr($1)
+        $$ = new NonTermStr($1);
         } |
     TRUE {
         $$ = new NonTermBool();
@@ -116,25 +116,25 @@ Exp :
         $$ = new NonTermBool();
         } |
 	Exp AND Exp {
-        if(IsValidBoolExp($1,$2,$3))
+        if(NonTermBool::IsValidBoolExp($1,$2,$3))
         {
             $$ = new NonTermBool($1,$2);
         }   
     } |
     Exp OR Exp {
-        if(IsValidBoolExp($1,$2,$3))
+        if(NonTermBool::IsValidBoolExp($1,$2,$3))
         {
             $$ = new NonTermBool($1,$2);
         }   
     } |
     Exp RELOP Exp {
-        if(IsValidBoolExp($1,$2,$3))
+        if(NonTermBool::IsValidBoolExp($1,$2,$3))
         {
             $$ = new NonTermBool($1,$2);
         }   
     } |
     NOT Exp {
-        if(IsValidBoolExp($1))
+        if(NonTermBool::IsValidBoolExp($1))
         {
             $$ = new NonTermBool($1);
         }   
@@ -150,7 +150,7 @@ int main()
 	yyparse();
 }
 
-int yyerror(char * message)
+int yyerror(char const* message)
 {
 	cout<<"Parse error: "<<message<<endl;
 	exit(0);
