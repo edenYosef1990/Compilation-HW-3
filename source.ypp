@@ -8,6 +8,8 @@
 
 	extern int yylex();
 	int yyerror(char const*);
+
+    SymbolTable symbolTable;
 %}
 
 %token VOID
@@ -97,18 +99,28 @@ Type :
 ;
 Exp :
     ID {
-        $$ = new NonTermID($1);
+        TypeNameEnum type = symbolTable.GetTypeOfSymbol
+        ((dynamic_cast<IdVal*>(yylval))->GetVal());
+        std::string name = (dynamic_cast<IdVal*>(yylval))->GetVal();
+        switch(type){
+            case TYPE_FUNC: $$ = new NonTermFunc(name); break;
+            case TYPE_INT: $$ = new NonTermInt(name); break;
+            case TYPE_B: $$ = new NonTermB(name); break;
+            case TYPE_BYTE: $$ = new NonTermByte(name); break;
+            case TYPE_BOOL: $$ = new NonTermBool(name); break;
+            case TYPE_NONE: $$ = new IDNotExists(name); break;
+        }
     }|
     Call |
     NUM {$$ = new NonTermInt($1);} |
     NUM B {
         if(NonTermB::IsValidB($1))
         {
-            $$ = new NonTermB($1);
+            $$ = new NonTermB();
         }
      } |
     STRING {
-        $$ = new NonTermStr($1);
+        $$ = new NonTermStr();
         } |
     TRUE {
         $$ = new NonTermBool();
@@ -119,25 +131,25 @@ Exp :
 	Exp AND Exp {
         if(NonTermBool::IsValidBoolExp($1,$2,$3))
         {
-            $$ = new NonTermBool($1,$2);
+            $$ = new NonTermBool();
         }   
     } |
     Exp OR Exp {
         if(NonTermBool::IsValidBoolExp($1,$2,$3))
         {
-            $$ = new NonTermBool($1,$2);
+            $$ = new NonTermBool();
         }   
     } |
     Exp RELOP Exp {
         if(NonTermBool::IsValidBoolExp($1,$2,$3))
         {
-            $$ = new NonTermBool($1,$2);
+            $$ = new NonTermBool();
         }   
     } |
     NOT Exp {
         if(NonTermBool::IsValidBoolExp($1))
         {
-            $$ = new NonTermBool($1);
+            $$ = new NonTermBool();
         }   
     } 
 
@@ -148,6 +160,7 @@ Exp :
 
 int main()
 {
+    symbolTable = SymbolTable();
 	yyparse();
 }
 

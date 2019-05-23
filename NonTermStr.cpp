@@ -1,5 +1,5 @@
 #include "attributes.h"
 
-NonTermStr::NonTermStr(Node * node) {
+NonTermStr::NonTermStr(){}
 
-}
+NonTermStr::NonTermStr(std::string name) : DataObj(name) {}

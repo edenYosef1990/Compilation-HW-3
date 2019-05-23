@@ -16,21 +16,21 @@ int SymbolTable::getCurrentIndex(){
     return ScopesList.back().size();
 }
 
-void SymbolTable::AddSymbol(std::string name , int index){
-    ScopesList.back().push_back(Symbol(name,index));
+void SymbolTable::AddSymbol(std::string name , int index , TypeNameEnum type){
+    ScopesList.back().push_back(Symbol(name,index,type));
 }
 
-bool SymbolTable::IsSymbolExists(std::string name){
+TypeNameEnum SymbolTable::GetTypeOfSymbol(std::string name){
     for(std::list<std::list<Symbol>>::iterator it_scopes = ScopesList.begin() ; 
         it_scopes != ScopesList.end() ; it_scopes++){
             for(std::list<Symbol>::iterator it_scope = it_scopes->begin() ; 
                 it_scope != it_scopes->end() ; it_scope++) {
-                    if(it_scope->GetSymbolName() == name){
-                        return true;
+                    if(it_scope->GetName() == name){
+                        return it_scope->GetType();
                     }
                 }
         }
-    return false;
+    return TYPE_NONE;
 }
 
 

@@ -9,6 +9,7 @@
 class Node {
     public:
     Node(){}
+    virtual ~Node() = default;
 };
 
 //======================================token's Classes=====================================//
@@ -72,12 +73,14 @@ class NumVal : public Node {
     int val;
     public:
         NumVal(char * strNum) : val(CharPointerToInt(strNum)) {}
+        int getVal() {return val;}
 };
 
 class IdVal : public Node {
     std::string IdStr;
     public:
         IdVal(char * strId) : IdStr(strId) {}
+        std::string GetVal() {return IdStr;}
 };
 
 class StrVal : public Node {
@@ -88,35 +91,77 @@ class StrVal : public Node {
 
 //======================================Non Terminals's Classes=====================================//
 
-class NonTermBool : public Node {
+class DataObj : public Node {
+    std::string Name;
+    bool IsVar;
+    public:
+        DataObj(std::string name ) : Name(name) {
+            IsVar = true;
+        }
+        DataObj() {
+            IsVar = false;
+        }
+        bool IsItVar() {return IsVar;}
+        virtual ~DataObj() = default;
+};
+
+class NonTermBool : public DataObj {
+    std::string name;
+    bool IsVar;
     public:
     static bool IsValidBoolExp(Node * node);
     static bool IsValidBoolExp(Node * node1, Node * node2 , Node * node3);
     NonTermBool();
-    NonTermBool(Node * node);
-    NonTermBool(Node * node1 , Node * node2);
+    NonTermBool(std::string name);
+    bool IsItVar() {return IsItVar();}
 };
 
-class NonTermStr : public Node {
+class NonTermStr : public DataObj {
+     public:
+     NonTermStr();
+     NonTermStr(std::string name);
+};
+
+class NonTermInt : public DataObj {
+    int NumericValue;
     public:
-    NonTermStr(Node * node);
+    NonTermInt(Node * numericValueNode);
+    NonTermInt(std::string name);
+    int GetNumericValue();
 };
 
-class NonTermB : public Node {
+class NonTermB : public DataObj {
     public:
     static bool IsValidB(Node * node1);
     NonTermB();
-    NonTermB(Node * node);
+    NonTermB(std::string name);
 };
 
-class NonTermInt : public Node {
+class NonTermByte : public DataObj {
     public:
-    NonTermInt(Node * node);
+    NonTermByte();
+    NonTermByte(std::string name);
 };
 
-class NonTermID : public Node {
+class IDNotExists : public DataObj {
+    std::string name;
     public:
-    NonTermID(Node * node);
+    IDNotExists();
+    IDNotExists(std::string name);
+};
+
+class NonTermFunc : public DataObj {
+    std::string name;
+    public:
+    NonTermFunc();
+    NonTermFunc(std::string name);
+};
+
+class NonTermVoid : public DataObj {
+    std::string name;
+    public:
+    NonTermVoid();
+    NonTermVoid(std::string name);
 };
 
 
