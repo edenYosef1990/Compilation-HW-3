@@ -37,7 +37,7 @@
 %right LPAREN RPAREN
 %right LBRACE RBRACE
 %left ASSIGN
-%left  RELOP
+%nonassoc  RELOP
 %left  BINOP
 %token ID
 %token NUM
