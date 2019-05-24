@@ -1,6 +1,7 @@
 %{
 	#include "attributes.h"
     #include "SymbolTable.h"
+    #include "output.hpp"
 	#include <iostream>
 	#include <stdlib.h>
 
@@ -108,13 +109,14 @@ Exp :
             case TYPE_B: $$ = new NonTermB(name); break;
             case TYPE_BYTE: $$ = new NonTermByte(name); break;
             case TYPE_BOOL: $$ = new NonTermBool(name); break;
+            case TYPE_STR: $$ = new NonTerStr(name); break;
             case TYPE_NONE: $$ = new IDNotExists(name); break;
         }
     }|
-    Call |
+    Call | /* translate a function into an Expression , so an Exp object which is a variable cant be a function anyway */
     NUM {$$ = new NonTermInt($1);} |
     NUM B {
-        if(NonTermB::IsValidB($1))
+        if( IsItConstOrExistingSymbol(dynamic_cast<DataObj*>($1)) && NonTermB::IsValidB($1) )
         {
             $$ = new NonTermB();
         }
