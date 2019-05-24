@@ -124,8 +124,12 @@ Exp :
         TypeNameEnum type = symbolTable.GetTypeOfSymbol
         ((dynamic_cast<IdVal*>(yylval))->GetVal());
         std::string name = (dynamic_cast<IdVal*>(yylval))->GetVal();
+        Symbol * sym =  symbolTable.GetSymbol(name);
         switch(type){
-            case TYPE_FUNC: $$ = new NonTermFunc(name); break;
+            case TYPE_FUNC:{     FunctionSymbol * funcSym = dynamic_cast<FunctionSymbol*>(sym);
+                                $$ = new NonTermFunc(funcSym->GetName(),funcSym->GetParametersList(),funcSym->GetRetType()); 
+                                break;
+                            }
             case TYPE_INT: $$ = new NonTermInt(name); break;
             case TYPE_B: $$ = new NonTermB(name); break;
             case TYPE_BYTE: $$ = new NonTermByte(name); break;

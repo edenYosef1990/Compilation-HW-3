@@ -14,15 +14,17 @@ class Symbol {
     TypeNameEnum Type;
     public:
         Symbol(std::string _symbolName , int _symbolIndex , TypeNameEnum type) : SymbolName(_symbolName) , SymbolIndex(_symbolIndex) , Type(type) {}
+        Symbol(const Symbol& Sym) = default;
         std::string GetName() {return SymbolName;}
         int GetIndex() {return SymbolIndex;}
         TypeNameEnum GetType() {return Type;}
-        ~Symbol() = default;
+        virtual ~Symbol() = default;
 };
 
 class VariableSymbol : public Symbol {
     public:
     VariableSymbol(std::string _symbolName , int _symbolIndex , TypeNameEnum type) : Symbol(_symbolName,_symbolIndex,type) {}
+    VariableSymbol(const VariableSymbol& varSym) = default;
 };
 
 class FunctionSymbol : public Symbol {
@@ -31,6 +33,9 @@ class FunctionSymbol : public Symbol {
     public:
         FunctionSymbol(std::string _symbolName , int _symbolIndex , TypeNameEnum type , std::list<TypeNameEnum> parametersList , TypeNameEnum retType) : 
             Symbol(_symbolName,_symbolIndex,type) , ParametersList(parametersList) , RetType(retType) {}
+        FunctionSymbol(const FunctionSymbol& varSym) = default;
+        std::list<TypeNameEnum> GetParametersList() {return ParametersList;}
+        TypeNameEnum GetRetType() {return RetType;}
 };
 
 class SymbolTable {
@@ -43,7 +48,9 @@ class SymbolTable {
         bool ExitScope();
         int getCurrentIndex();
         void AddSymbol(std::string name , int index , TypeNameEnum type);
+        void AddFuncSymbol(std::string name , int index , TypeNameEnum type , std::list<TypeNameEnum> parametersList , TypeNameEnum retType);
         TypeNameEnum GetTypeOfSymbol(std::string name);
+        Symbol* GetSymbol(std::string name);
 };
 
 #endif
