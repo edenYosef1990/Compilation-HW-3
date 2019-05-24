@@ -82,8 +82,9 @@ class NumVal : public Node {
 };
 
 class IdVal : public Node {
-    std::string IdStr;
+    
     public:
+    std::string IdStr;
         IdVal(char * strId) : IdStr(strId) {}
         std::string GetVal() {return IdStr;}
 };
