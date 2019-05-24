@@ -24,6 +24,10 @@ void SymbolTable::AddSymbol(std::string name , int index , TypeNameEnum type){
     ScopesList.back().push_back(new Symbol(name,index,type));
 }
 
+void SymbolTable::AddVariableSymbol(std::string name , int index , TypeNameEnum type){
+    ScopesList.back().push_back(new VariableSymbol(name,index,type));
+}
+
 void SymbolTable::AddFuncSymbol(std::string name , int index , TypeNameEnum type , std::list<TypeNameEnum> parametersList , TypeNameEnum retType){
     ScopesList.back().push_back(new FunctionSymbol(name,index,type,parametersList,retType));  // sould be changed for Functions!
 }
@@ -38,7 +42,7 @@ TypeNameEnum SymbolTable::GetTypeOfSymbol(std::string name){
                     }
                 }
         }
-    return TYPE_NONE;
+    return TYPE_NONEXIST;
 }
 
 Symbol* SymbolTable::GetSymbol(std::string name){

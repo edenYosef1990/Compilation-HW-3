@@ -48,6 +48,7 @@ class SymbolTable {
         bool ExitScope();
         int getCurrentIndex();
         void AddSymbol(std::string name , int index , TypeNameEnum type);
+        void AddVariableSymbol(std::string name , int index , TypeNameEnum type);
         void AddFuncSymbol(std::string name , int index , TypeNameEnum type , std::list<TypeNameEnum> parametersList , TypeNameEnum retType);
         TypeNameEnum GetTypeOfSymbol(std::string name);
         Symbol* GetSymbol(std::string name);

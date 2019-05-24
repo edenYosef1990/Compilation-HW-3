@@ -3,10 +3,10 @@
 
 #include <iostream>
 #include "list"
+#include "vector"
 #include "string"
 #include "typeEnums.h"
 #include "AidFunctions.h"
-
 
 using namespace std;
 
@@ -95,7 +95,7 @@ class StrVal : public Node {
         StrVal(char * strVal) : str(strVal) {}
 };
 
-//======================================Non Terminals's Classes=====================================//
+//======================================Data Objects Classes=====================================//
 
 class DataObj : public Node {
     public:
@@ -163,6 +163,7 @@ class NonTermFunc : public DataObj {
     std::list<TypeNameEnum> Parameters;
     TypeNameEnum RetType;
     public:
+        NonTermFunc();
         NonTermFunc(std::string name , std::list<TypeNameEnum> parameters , TypeNameEnum retType);
         TypeNameEnum GetRetType() {return RetType;}
 };
@@ -174,9 +175,34 @@ class NonTermVoid : public DataObj {
     NonTermVoid(std::string name);
 };
 
+//======================================Program Flow Classes=====================================//
+
+class ParaListObj : public Node {
+    std::list<TypeNameEnum> paraList;
+    public:
+        ParaListObj(TypeNameEnum newPara) {
+            paraList.push_back(newPara);
+        }
+        ParaListObj(ParaListObj * oldList , TypeNameEnum newPara) : paraList(oldList->paraList) {
+            paraList.push_back(newPara);
+        }
+        std::list<TypeNameEnum> GetParaList() {return paraList;}
+
+};
+
 //======================================Attributes-related Functions=====================================//
 
 bool IsItConstOrExistingSymbol(DataObj * dataObject);
+
+Node* symbolNameToExp(TypeNameEnum type , std::string);
+
+Node* CallToExp(TypeNameEnum type);
+
+TypeNameEnum ExpToFuncPara(Node * node);
+
+std::vector<string> ParaListToStrings(std::list<TypeNameEnum> paraList1);
+
+std::vector<string> CallToRetType(std::list<TypeNameEnum> paraList1);
 
 
 #define YYSTYPE Node*

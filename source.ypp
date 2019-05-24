@@ -11,7 +11,7 @@
     extern int yylineno;
 	int yyerror(char const*);
 
-    SymbolTable symbolTable;
+    SymbolTable globalSymbolTable;
 %}
 
 %token VOID
@@ -81,26 +81,30 @@ Statements :
 Statement : 
     LBRACE Statements RBRACE | 
     Type ID SC {
-        enum TypeNameEnum type = symbolTable.GetTypeOfSymbol((dynamic_cast<IdVal*>($2))->IdStr);
-        if(type != TYPE_NONE){
+        std::string name = (dynamic_cast<IdVal*>($2))->IdStr;
+        enum TypeNameEnum type = globalSymbolTable.GetTypeOfSymbol(name);
+        if(type != TYPE_NONEXIST){
             output::errorDef(yylineno,(dynamic_cast<IdVal*>($2))->IdStr);
             exit(0);
         }
+        globalSymbolTable.AddVariableSymbol(name , globalSymbolTable.getCurrentIndex()+1 ,type);
     }| 
     Type ID ASSIGN Exp SC { 
-        enum TypeNameEnum type = symbolTable.GetTypeOfSymbol((dynamic_cast<IdVal*>($2))->IdStr);
-        if(type != TYPE_NONE){
+        std::string name = (dynamic_cast<IdVal*>($2))->IdStr;
+        enum TypeNameEnum type = globalSymbolTable.GetTypeOfSymbol((dynamic_cast<IdVal*>($2))->IdStr);
+        if(type != TYPE_NONEXIST){
             output::errorDef(yylineno,(dynamic_cast<IdVal*>($2))->IdStr);
             exit(0);
         }
         if(dynamic_cast<Type*>($1)->name != dynamic_cast<DataObj*>($4)->type){
             output::errorMismatch(yylineno);
         }
+        globalSymbolTable.AddVariableSymbol(name , globalSymbolTable.getCurrentIndex()+1 ,type);
     }
     | 
     ID ASSIGN Exp SC {
-        enum TypeNameEnum type = symbolTable.GetTypeOfSymbol((dynamic_cast<IdVal*>($1))->IdStr);
-        if(type == TYPE_NONE){
+        enum TypeNameEnum type = globalSymbolTable.GetTypeOfSymbol((dynamic_cast<IdVal*>($1))->IdStr);
+        if(type == TYPE_NONEXIST){
             output::errorUndef(yylineno, (dynamic_cast<IdVal*>($1))->IdStr);
         }
         if(type != dynamic_cast<DataObj*>($3)->type){
@@ -113,12 +117,44 @@ Statement :
     BREAK SC | CONTINUE SC
 ;
 
-Call :
-    ID LPAREN ExpList RPAREN |
-    ID LPAREN RPAREN 
+Call : 
+    ID LPAREN ExpList RPAREN { 
+        Symbol * sym = globalSymbolTable.GetSymbol((dynamic_cast<IdVal*>($1))->IdStr);
+        if(sym == nullptr || sym->GetType() != TYPE_FUNC ){
+            output::errorUndefFunc(yylineno,(dynamic_cast<IdVal*>($1))->IdStr);
+            exit(0);
+        }
+        std::list<TypeNameEnum> symParas = (dynamic_cast<FunctionSymbol*>(sym))->GetParametersList(); 
+        std::list<TypeNameEnum> expListparas = (dynamic_cast<ParaListObj*>($3))->GetParaList();
+        if(symParas != expListparas){
+            output::errorPrototypeMismatch(yylineno,(dynamic_cast<IdVal*>($1))->IdStr,&ParaListToStrings(symParas));
+            exit(0);
+        }
+        $$ = CallToExp(sym->GetType());
+    }|
+    ID LPAREN RPAREN {
+        Symbol * sym = globalSymbolTable.GetSymbol((dynamic_cast<IdVal*>($1))->IdStr);
+        if(sym == nullptr || sym->GetType() != TYPE_FUNC ){
+            output::errorUndefFunc(yylineno,(dynamic_cast<IdVal*>($1))->IdStr);
+            exit(0);
+        }
+        std::list<TypeNameEnum> symParas = (dynamic_cast<FunctionSymbol*>(sym))->GetParametersList(); 
+        std::list<TypeNameEnum> expListparas = std::list<TypeNameEnum>();
+        if(symParas != expListparas){
+            output::errorPrototypeMismatch(yylineno,(dynamic_cast<IdVal*>($1))->IdStr,ParaListToStrings(symParas));
+            exit(0);
+        }
+        $$ = CallToExp(sym->GetType());
+    }
 ;
 ExpList :
-    Exp COMMA ExpList | Exp
+    Exp COMMA ExpList 
+    {
+        ParaListObj* paralist = dynamic_cast<ParaListObj*>($3);
+        TypeNameEnum type = ExpToFuncPara($1);
+        $$ = new ParaListObj(paralist,type);
+        } | 
+    Exp { $$ = new ParaListObj(ExpToFuncPara($1));}
 ;
 Type :
     INT{ $$ = new Type(TYPE_INT);} |
@@ -127,37 +163,28 @@ Type :
 ;
 Exp : 
     ID {
-        TypeNameEnum type = symbolTable.GetTypeOfSymbol
-        ((dynamic_cast<IdVal*>(yylval))->GetVal());
         std::string name = (dynamic_cast<IdVal*>(yylval))->GetVal();
-        Symbol * sym =  symbolTable.GetSymbol(name);
-        switch(type){
-            case TYPE_FUNC:{     FunctionSymbol * funcSym = dynamic_cast<FunctionSymbol*>(sym);
-                                $$ = new NonTermFunc(funcSym->GetName(),funcSym->GetParametersList(),funcSym->GetRetType()); 
-                                break;
-                            }
-            case TYPE_INT: $$ = new NonTermInt(name); break;
-            case TYPE_B: $$ = new NonTermB(name); break;
-            case TYPE_BYTE: $$ = new NonTermByte(name); break;
-            case TYPE_BOOL: $$ = new NonTermBool(name); break;
-            case TYPE_STR: $$ = new NonTermStr(name); break;
-            case TYPE_NONE: $$ = new IDNotExists(name); break;
+        Node* returnedNode = symbolNameToExp(globalSymbolTable.GetTypeOfSymbol(name) , name);
+        if(dynamic_cast<IDNotExists*>(returnedNode) != nullptr){
+            yyerror("no such variable!");
         }
-    }|
-    Call { TypeNameEnum typeName = (dynamic_cast<NonTermFunc*>($1))->GetRetType;
-            switch(type):
-            {
-            case TYPE_INT: $$ = new NonTermInt(); break;
-            case TYPE_B: $$ = new NonTermB(); break;
-            case TYPE_BYTE: $$ = new NonTermByte(); break;
-            case TYPE_BOOL: $$ = new NonTermBool(); break;
-            case TYPE_STR: $$ = new NonTermStr(); break;
-            } }  |  
+        else if(dynamic_cast<NonTermFunc*>(returnedNode) != nullptr){
+            yyerror("this is the name of a function!");
+        }
+        else {
+            $$ = returnedNode;
+        }
+    } |
+    Call { TypeNameEnum type = ExpToFuncPara($1);
+            $$ = CallToExp(type); }  |  
     NUM {$$ = new NonTermInt($1);} |
     NUM B {
         if( IsItConstOrExistingSymbol(dynamic_cast<DataObj*>($1)) && NonTermB::IsValidB($1) )
         {
             $$ = new NonTermB();
+        }
+        else {
+            output::errorByteTooLarge(yylineno,(dynamic_cast<IdVal*>($2))->IdStr);
         }
      } |
     STRING {
@@ -201,7 +228,7 @@ Exp :
 
 int main()
 {
-    symbolTable = SymbolTable();
+    globalSymbolTable = SymbolTable();
 	yyparse();
 }
 
