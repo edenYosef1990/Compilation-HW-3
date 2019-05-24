@@ -125,7 +125,7 @@ Type :
      BYTE { $$ = new Type(TYPE_BYTE); } |
       BOOL { $$ = new Type(TYPE_BOOL); }
 ;
-Exp :
+Exp : 
     ID {
         TypeNameEnum type = symbolTable.GetTypeOfSymbol
         ((dynamic_cast<IdVal*>(yylval))->GetVal());
@@ -144,7 +144,15 @@ Exp :
             case TYPE_NONE: $$ = new IDNotExists(name); break;
         }
     }|
-    Call | /* translate a function into an Expression , so an Exp object which is a variable cant be a function anyway */
+    Call { TypeNameEnum typeName = (dynamic_cast<NonTermFunc*>($1))->GetRetType;
+            switch(type):
+            {
+            case TYPE_INT: $$ = new NonTermInt(); break;
+            case TYPE_B: $$ = new NonTermB(); break;
+            case TYPE_BYTE: $$ = new NonTermByte(); break;
+            case TYPE_BOOL: $$ = new NonTermBool(); break;
+            case TYPE_STR: $$ = new NonTermStr(); break;
+            } }  |  
     NUM {$$ = new NonTermInt($1);} |
     NUM B {
         if( IsItConstOrExistingSymbol(dynamic_cast<DataObj*>($1)) && NonTermB::IsValidB($1) )

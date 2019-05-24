@@ -132,6 +132,7 @@ class NonTermStr : public DataObj {
 class NonTermInt : public DataObj {
     int NumericValue;
     public:
+    NonTermInt();
     NonTermInt(Node * numericValueNode);
     NonTermInt(std::string name);
     int GetNumericValue();
@@ -163,6 +164,7 @@ class NonTermFunc : public DataObj {
     TypeNameEnum RetType;
     public:
         NonTermFunc(std::string name , std::list<TypeNameEnum> parameters , TypeNameEnum retType);
+        TypeNameEnum GetRetType() {return RetType;}
 };
 
 class NonTermVoid : public DataObj {
