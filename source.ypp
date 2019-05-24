@@ -80,11 +80,17 @@ Statements :
 ;
 Statement : 
     LBRACE Statements RBRACE | 
-    Type ID SC | 
-    Type ID ASSIGN Exp SC { 
-        enum TypeNameEnum type = symbolTable.GetTypeOfSymbol((dynamic_cast<DataObj*>($2))->Name);
+    Type ID SC {
+        enum TypeNameEnum type = symbolTable.GetTypeOfSymbol((dynamic_cast<IdVal*>($2))->IdStr);
         if(type != TYPE_NONE){
-            output::errorDef(yylineno,(dynamic_cast<DataObj*>($2))->Name);
+            output::errorDef(yylineno,(dynamic_cast<IdVal*>($2))->IdStr);
+            exit(0);
+        }
+    }| 
+    Type ID ASSIGN Exp SC { 
+        enum TypeNameEnum type = symbolTable.GetTypeOfSymbol((dynamic_cast<IdVal*>($2))->IdStr);
+        if(type != TYPE_NONE){
+            output::errorDef(yylineno,(dynamic_cast<IdVal*>($2))->IdStr);
             exit(0);
         }
         if(dynamic_cast<Type*>($1)->name != dynamic_cast<DataObj*>($4)->type){
@@ -93,9 +99,9 @@ Statement :
     }
     | 
     ID ASSIGN Exp SC {
-        enum TypeNameEnum type = symbolTable.GetTypeOfSymbol((dynamic_cast<DataObj*>($2))->Name);
+        enum TypeNameEnum type = symbolTable.GetTypeOfSymbol((dynamic_cast<IdVal*>($1))->IdStr);
         if(type == TYPE_NONE){
-            output::errorUndef(yylineno, dynamic_cast<DataObj*>($1)->Name);
+            output::errorUndef(yylineno, (dynamic_cast<IdVal*>($1))->IdStr);
         }
         if(type != dynamic_cast<DataObj*>($3)->type){
             output::errorMismatch(yylineno);
