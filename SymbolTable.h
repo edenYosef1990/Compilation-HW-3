@@ -17,11 +17,24 @@ class Symbol {
         std::string GetName() {return SymbolName;}
         int GetIndex() {return SymbolIndex;}
         TypeNameEnum GetType() {return Type;}
-    
+        ~Symbol() = default;
+};
+
+class VariableSymbol : public Symbol {
+    public:
+    VariableSymbol(std::string _symbolName , int _symbolIndex , TypeNameEnum type) : Symbol(_symbolName,_symbolIndex,type) {}
+};
+
+class FunctionSymbol : public Symbol {
+    std::list<TypeNameEnum> ParametersList;
+    TypeNameEnum RetType;
+    public:
+        FunctionSymbol(std::string _symbolName , int _symbolIndex , TypeNameEnum type , std::list<TypeNameEnum> parametersList , TypeNameEnum retType) : 
+            Symbol(_symbolName,_symbolIndex,type) , ParametersList(parametersList) , RetType(retType) {}
 };
 
 class SymbolTable {
-    std::list<std::list<Symbol>> ScopesList;
+    std::list<std::list<Symbol*>> ScopesList;
     int CurrentScopeLevel;
     int CurrentIndexInScope;
     public:

@@ -2,9 +2,14 @@
 #define ATTR_H
 
 #include <iostream>
+#include "list"
 #include "string"
 #include "typeEnums.h"
 #include "AidFunctions.h"
+
+
+using namespace std;
+
 
 class Node {
     public:
@@ -152,9 +157,10 @@ class IDNotExists : public DataObj {
 
 class NonTermFunc : public DataObj {
     std::string name;
+    std::list<TypeNameEnum> Parameters;
+    TypeNameEnum RetType;
     public:
-    NonTermFunc();
-    NonTermFunc(std::string name);
+        NonTermFunc(std::string name , std::list<TypeNameEnum> parameters , TypeNameEnum retType);
 };
 
 class NonTermVoid : public DataObj {
@@ -163,6 +169,8 @@ class NonTermVoid : public DataObj {
     NonTermVoid();
     NonTermVoid(std::string name);
 };
+
+//======================================Attributes-related Functions=====================================//
 
 bool IsItConstOrExistingSymbol(DataObj * dataObject);
 
