@@ -6,8 +6,6 @@
 
 int CharPointerToInt(char * str);
 
-bool IsItConstOrExistingSymbol(DataObj * dataObject);
-
 
 
 #endif

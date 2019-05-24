@@ -109,7 +109,7 @@ Exp :
             case TYPE_B: $$ = new NonTermB(name); break;
             case TYPE_BYTE: $$ = new NonTermByte(name); break;
             case TYPE_BOOL: $$ = new NonTermBool(name); break;
-            case TYPE_STR: $$ = new NonTerStr(name); break;
+            case TYPE_STR: $$ = new NonTermStr(name); break;
             case TYPE_NONE: $$ = new IDNotExists(name); break;
         }
     }|

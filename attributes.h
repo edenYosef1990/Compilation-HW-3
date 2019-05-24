@@ -164,6 +164,8 @@ class NonTermVoid : public DataObj {
     NonTermVoid(std::string name);
 };
 
+bool IsItConstOrExistingSymbol(DataObj * dataObject);
+
 
 #define YYSTYPE Node*
 
