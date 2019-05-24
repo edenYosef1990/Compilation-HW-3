@@ -8,6 +8,7 @@
 	using namespace std;
 
 	extern int yylex();
+    extern int yylineno;
 	int yyerror(char const*);
 
     SymbolTable symbolTable;
@@ -80,8 +81,26 @@ Statements :
 Statement : 
     LBRACE Statements RBRACE | 
     Type ID SC | 
-    Type ID ASSIGN Exp SC | 
-    ID ASSIGN Exp SC | 
+    Type ID ASSIGN Exp SC { 
+        enum TypeNameEnum type = symbolTable.GetTypeOfSymbol((dynamic_cast<DataObj*>($2))->Name);
+        if(type != TYPE_NONE){
+            output::errorDef(yylineno,(dynamic_cast<DataObj*>($2))->Name);
+            exit(0);
+        }
+        if(dynamic_cast<Type*>($1)->name != dynamic_cast<DataObj*>($4)->type){
+            output::errorMismatch(yylineno);
+        }
+    }
+    | 
+    ID ASSIGN Exp SC {
+        enum TypeNameEnum type = symbolTable.GetTypeOfSymbol((dynamic_cast<DataObj*>($2))->Name);
+        if(type == TYPE_NONE){
+            output::errorUndef(yylineno, dynamic_cast<DataObj*>($1)->Name);
+        }
+        if(type != dynamic_cast<DataObj*>($3)->type){
+            output::errorMismatch(yylineno);
+        }
+    }| 
     IF LPAREN Exp RPAREN Statement %prec "then" |
     IF LPAREN Exp RPAREN Statement ELSE Statement |
     WHILE LPAREN Exp RPAREN Statement |
@@ -96,7 +115,9 @@ ExpList :
     Exp COMMA ExpList | Exp
 ;
 Type :
-    INT | BYTE | BOOL
+    INT{ $$ = new Type(TYPE_INT);} |
+     BYTE { $$ = new Type(TYPE_BYTE); } |
+      BOOL { $$ = new Type(TYPE_BOOL); }
 ;
 Exp :
     ID {

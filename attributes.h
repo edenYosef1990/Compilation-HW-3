@@ -20,8 +20,8 @@ class Node {
 //======================================token's Classes=====================================//
 
 class Type : public Node {
-    TypeNameEnum name;
     public:
+    TypeNameEnum name;
         Type(TypeNameEnum _typeName) : name(_typeName) {}
 };
 
@@ -97,9 +97,10 @@ class StrVal : public Node {
 //======================================Non Terminals's Classes=====================================//
 
 class DataObj : public Node {
-    std::string Name;
-    bool IsVar;
     public:
+        TypeNameEnum type;
+        std::string Name;
+        bool IsVar;
         DataObj(std::string name ) : Name(name) {
             IsVar = true;
         }

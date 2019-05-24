@@ -1,10 +1,10 @@
 #include "attributes.h"
 
 NonTermB::NonTermB() {
-
+this->type = TYPE_B;
 }
 
-NonTermB::NonTermB(std::string name) : DataObj(name) {}
+NonTermB::NonTermB(std::string name) : DataObj(name) {this->type = TYPE_B;}
 
 bool NonTermB::IsValidB(Node * node){
     
