@@ -12,6 +12,7 @@
 	int yyerror(char const*);
 
     SymbolTable globalSymbolTable;
+    int in_while_flag;
 %}
 
 %token VOID
@@ -79,7 +80,7 @@ Statements :
     Statement | Statements Statement
 ;
 Statement : 
-    LBRACE Statements RBRACE | 
+    LBRACE OPEN_SCOPE Statements CLOSE_SCOPE RBRACE | 
     Type ID SC {
         std::string name = (dynamic_cast<IdVal*>($2))->IdStr;
         enum TypeNameEnum type = globalSymbolTable.GetTypeOfSymbol(name);
@@ -111,16 +112,30 @@ Statement :
             output::errorMismatch(yylineno);
         }
     }| 
-    IF LPAREN OPEN_SCOPE Exp RPAREN Statement %prec "then" CLOSE_SCOPE |
-    IF LPAREN OPEN_SCOPE Exp RPAREN Statement CLOSE_SCOPE ELSE OPEN_SCOPE Statement CLOSE_SCOPE |
-    WHILE LPAREN Exp RPAREN Statement |
-    BREAK SC | CONTINUE SC
+    IF LPAREN OPEN_SCOPE Exp RPAREN Statement CLOSE_SCOPE %prec "then" |
+    IF LPAREN OPEN_SCOPE Exp RPAREN Statement ELSE Statement CLOSE_SCOPE |
+    WHILE LPAREN WHILE_FLAG_IN OPEN_SCOPE Exp RPAREN Statement WHILE_FLAG_OUT CLOSE_SCOPE |
+    BREAK {if(in_while_flag<=0){
+        output::errorUnexpectedBreak(yylineno);
+        exit(0);
+    }} SC |
+     CONTINUE{
+         if(in_while_flag<=0){
+        output::errorUnexpectedContinue(yylineno);
+        exit(0);
+    }} SC|
+    RETURN CLOSE_SCOPE SC|
+    RETURN Exp CLOSE_SCOPE SC|
+    Call SC
 ;
+
 OPEN_SCOPE: {globalSymbolTable.EnterScope();}/*epsilon*/;
 CLOSE_SCOPE: {globalSymbolTable.ExitScope();}/*epsilon*/;
+WHILE_FLAG_IN: {in_while_flag++;}
+WHILE_FLAG_OUT: {in_while_flag--;}
 
 Call : 
-    ID LPAREN ExpList RPAREN { 
+    ID LPAREN OPEN_SCOPE ExpList RPAREN { 
         Symbol * sym = globalSymbolTable.GetSymbol((dynamic_cast<IdVal*>($1))->IdStr);
         if(sym == nullptr || sym->GetType() != TYPE_FUNC ){
             output::errorUndefFunc(yylineno,(dynamic_cast<IdVal*>($1))->IdStr);
@@ -128,14 +143,14 @@ Call :
         }
         std::list<TypeNameEnum> symParas = (dynamic_cast<FunctionSymbol*>(sym))->GetParametersList(); 
         std::list<TypeNameEnum> expListparas = (dynamic_cast<ParaListObj*>($3))->GetParaList();
-        /*std::vector<string> vector_symParas = ParaListToStrings(symParas);*/
+        std::vector<string> vector_symParas = ParaListToStrings(symParas);
         if(symParas != expListparas){
-            /*output::errorPrototypeMismatch(yylineno,(dynamic_cast<IdVal*>($1))->IdStr,vector_symParas);*/
+            output::errorPrototypeMismatch(yylineno,(dynamic_cast<IdVal*>($1))->IdStr,vector_symParas);
             exit(0);
         }
         $$ = CallToExp(sym->GetType());
     }|
-    ID LPAREN RPAREN {
+    ID LPAREN OPEN_SCOPE RPAREN {
         Symbol * sym = globalSymbolTable.GetSymbol((dynamic_cast<IdVal*>($1))->IdStr);
         if(sym == nullptr || sym->GetType() != TYPE_FUNC ){
             output::errorUndefFunc(yylineno,(dynamic_cast<IdVal*>($1))->IdStr);
@@ -144,8 +159,8 @@ Call :
         std::list<TypeNameEnum> symParas = (dynamic_cast<FunctionSymbol*>(sym))->GetParametersList(); 
         std::list<TypeNameEnum> expListparas = std::list<TypeNameEnum>();
         if(symParas != expListparas){
-           /* std::vector<string> vector_symParas = ParaListToStrings(symParas);*/
-            /*output::errorPrototypeMismatch(yylineno,(dynamic_cast<IdVal*>($1))->IdStr,vector_symParas);*/
+            std::vector<string> vector_symParas = ParaListToStrings(symParas);
+            output::errorPrototypeMismatch(yylineno,(dynamic_cast<IdVal*>($1))->IdStr,vector_symParas);
             exit(0);
         }
         $$ = CallToExp(sym->GetType());
@@ -166,6 +181,8 @@ Type :
       BOOL { $$ = new Type(TYPE_BOOL); }
 ;
 Exp : 
+    LPAREN Exp RPAREN |
+    Exp BINOP Exp |
     ID {
         std::string name = (dynamic_cast<IdVal*>(yylval))->GetVal();
         Node* returnedNode = symbolNameToExp(globalSymbolTable.GetTypeOfSymbol(name) , name);
@@ -233,6 +250,7 @@ Exp :
 int main()
 {
     globalSymbolTable = SymbolTable();
+    in_while_flag = 0;
 	yyparse();
 }
 
