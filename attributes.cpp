@@ -10,7 +10,7 @@ bool IsItConstOrExistingSymbol(DataObj * dataObject){
     return false;
 }
 
-Node* symbolNameToExpObj(TypeNameEnum type , std::string){
+Node* symbolNameToExp(TypeNameEnum type , std::string){
         switch(type){
             case TYPE_FUNC: return new NonTermFunc() ; break; // A Function cant be an ID in expression , so it must be an error!
             case TYPE_INT: return new NonTermInt(); break;

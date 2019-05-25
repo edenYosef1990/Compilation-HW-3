@@ -111,11 +111,13 @@ Statement :
             output::errorMismatch(yylineno);
         }
     }| 
-    IF LPAREN Exp RPAREN Statement %prec "then" |
-    IF LPAREN Exp RPAREN Statement ELSE Statement |
+    IF LPAREN OPEN_SCOPE Exp RPAREN Statement %prec "then" CLOSE_SCOPE |
+    IF LPAREN OPEN_SCOPE Exp RPAREN Statement CLOSE_SCOPE ELSE OPEN_SCOPE Statement CLOSE_SCOPE |
     WHILE LPAREN Exp RPAREN Statement |
     BREAK SC | CONTINUE SC
 ;
+OPEN_SCOPE: {globalSymbolTable.EnterScope();}/*epsilon*/;
+CLOSE_SCOPE: {globalSymbolTable.ExitScope();}/*epsilon*/;
 
 Call : 
     ID LPAREN ExpList RPAREN { 
@@ -126,8 +128,9 @@ Call :
         }
         std::list<TypeNameEnum> symParas = (dynamic_cast<FunctionSymbol*>(sym))->GetParametersList(); 
         std::list<TypeNameEnum> expListparas = (dynamic_cast<ParaListObj*>($3))->GetParaList();
+        /*std::vector<string> vector_symParas = ParaListToStrings(symParas);*/
         if(symParas != expListparas){
-            output::errorPrototypeMismatch(yylineno,(dynamic_cast<IdVal*>($1))->IdStr,&ParaListToStrings(symParas));
+            /*output::errorPrototypeMismatch(yylineno,(dynamic_cast<IdVal*>($1))->IdStr,vector_symParas);*/
             exit(0);
         }
         $$ = CallToExp(sym->GetType());
@@ -141,7 +144,8 @@ Call :
         std::list<TypeNameEnum> symParas = (dynamic_cast<FunctionSymbol*>(sym))->GetParametersList(); 
         std::list<TypeNameEnum> expListparas = std::list<TypeNameEnum>();
         if(symParas != expListparas){
-            output::errorPrototypeMismatch(yylineno,(dynamic_cast<IdVal*>($1))->IdStr,ParaListToStrings(symParas));
+           /* std::vector<string> vector_symParas = ParaListToStrings(symParas);*/
+            /*output::errorPrototypeMismatch(yylineno,(dynamic_cast<IdVal*>($1))->IdStr,vector_symParas);*/
             exit(0);
         }
         $$ = CallToExp(sym->GetType());
