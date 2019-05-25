@@ -14,7 +14,6 @@ Node* symbolNameToExp(TypeNameEnum type , std::string){
         switch(type){
             case TYPE_FUNC: return new NonTermFunc() ; break; // A Function cant be an ID in expression , so it must be an error!
             case TYPE_INT: return new NonTermInt(); break;
-            case TYPE_B: return new NonTermB(); break;
             case TYPE_BYTE: return new NonTermByte(); break;
             case TYPE_BOOL: return new NonTermBool(); break;
             case TYPE_STR: return new NonTermStr(); break;
@@ -25,7 +24,6 @@ Node* symbolNameToExp(TypeNameEnum type , std::string){
 Node* CallToExp(TypeNameEnum type){
     switch(type){
             case TYPE_INT: return new NonTermInt(); break;
-            case TYPE_B: return new NonTermB(); break;
             case TYPE_BYTE: return new NonTermByte(); break;
             case TYPE_BOOL: return new NonTermBool(); break;
             case TYPE_STR: return new NonTermStr(); break;
@@ -43,9 +41,6 @@ TypeNameEnum ExpToFuncPara(Node * node){
     else if(dynamic_cast<NonTermStr*>(node)!= nullptr){
         return TYPE_BOOL;
     }
-    else if(dynamic_cast<NonTermB*>(node)!= nullptr){
-        return TYPE_B;
-    }
     else if(dynamic_cast<NonTermByte*>(node)!= nullptr){
         return TYPE_BYTE;
     }
@@ -59,7 +54,6 @@ std::vector<string> ParaListToStrings(std::list<TypeNameEnum> paraList){
         std::string currPar = ""; 
         switch(type){
             case TYPE_INT: currPar="int"; break;
-            case TYPE_B: currPar="b"; break;
             case TYPE_BYTE: currPar="byte"; break;
             case TYPE_BOOL: currPar="bool"; break;
         }
@@ -68,4 +62,10 @@ std::vector<string> ParaListToStrings(std::list<TypeNameEnum> paraList){
     }
     return vec;
 
+}
+
+int yyerror(char const* message)
+{
+	cout<<"eden error: "<<message<<endl;
+	exit(0);
 }

@@ -3,14 +3,17 @@
 	#include "source.tab.hpp"
 %}
 
+
 %option yylineno
 %option noyywrap
+whitespace		([\t\n ])
+
 
 %%
 
 void        		    {yylval = new Type(TYPE_VOID); return VOID;}
 int         			{yylval = new Type(TYPE_INT); return INT;}
-b          				{yylval = new Type(TYPE_B); return B;}
+b          				{yylval = new Type(TYPE_BYTE); return B;}
 byte         		    {yylval = new Type(TYPE_BYTE); return BYTE;}
 bool                	{yylval = new Type(TYPE_BOOL); return BOOL;}
 and          			{yylval = new Op(OP_AND); return AND;}
@@ -36,7 +39,8 @@ continue          		{yylval = new CmdWord(CMD_CONTINUE); return CONTINUE;}
 [\+\-\*\/]               	{yylval = new Op(yytext); return BINOP;}
 (0|[1-9][0-9]*) 		{yylval = new NumVal(yytext); return NUM;}
 [a-zA-Z][a-zA-Z0-9]*          	{yylval = new IdVal(yytext); return ID;}
-([^\n\r\"\\]|\\[rnt"\\])+       {yylval = new StrVal(yytext); return STRING;}
+\"([^\n\r\"\\]|\\[rnt"\\])+\"      {yylval = new StrVal(yytext); return STRING;}
+{whitespace}			;
 .		                printf("Lex doesn't know what that is!\n");
 
 %%

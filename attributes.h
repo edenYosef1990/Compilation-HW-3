@@ -138,15 +138,9 @@ class NonTermInt : public DataObj {
     int GetNumericValue();
 };
 
-class NonTermB : public DataObj {
-    public:
-    static bool IsValidB(Node * node1);
-    NonTermB();
-    NonTermB(std::string name);
-};
-
 class NonTermByte : public DataObj {
     public:
+    static bool IsValidByte(Node * node1);
     NonTermByte();
     NonTermByte(std::string name);
 };
@@ -187,6 +181,20 @@ class ParaListObj : public Node {
             paraList.push_back(newPara);
         }
         std::list<TypeNameEnum> GetParaList() {return paraList;}
+};
+    
+class PreCondListObj : public Node {
+    int numCond;
+    public:
+        PreCondListObj(PreCondListObj * oldPreCondList) {
+            if(oldPreCondList!=nullptr){
+                numCond=(oldPreCondList->numCond) + 1;
+            }
+            else{
+                numCond=1;
+            }
+        }
+        int GetNumCond() {return numCond;}
 
 };
 
@@ -204,6 +212,7 @@ std::vector<string> ParaListToStrings(std::list<TypeNameEnum> paraList1);
 
 std::vector<string> CallToRetType(std::list<TypeNameEnum> paraList1);
 
+int yyerror(char const* message);
 
 #define YYSTYPE Node*
 
