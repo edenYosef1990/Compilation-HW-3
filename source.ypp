@@ -51,7 +51,7 @@
 %%
 
 Program  : 
-    Funcs 
+    Funcs // 
 ;
 Funcs : 
     /*epsilon*/ | {CallToEnterScope(globalSymbolTable);} FuncDecl {CallToExitScope(globalSymbolTable);}
@@ -85,17 +85,18 @@ Statements :
     Statement | Statements Statement // dont need to do anything right now
 ;
 Statement : 
-    LBRACE {CallToEnterScope(globalSymbolTable);} Statements {CallToExitScope(globalSymbolTable);} RBRACE                             | 
-    Type ID SC               {StatmentAction1(globalSymbolTable,$1,$2,$3);}                                                           | 
-    Type ID ASSIGN Exp SC    {StatmentAction2(globalSymbolTable ,$1,$2,$3,$4,$5);}                                                    | 
-    ID ASSIGN Exp SC         {StatmentAction3(globalSymbolTable,$1,$2,$3,$4);}                                                        | 
-    IF_SUFFIX {CallToEnterScope(globalSymbolTable);} %prec "then"                                                                     |
-    IF_SUFFIX ELSE {CallToEnterScope(globalSymbolTable);} Statement                                                                   |
-    WHILE LPAREN {CallToEnterScope(globalSymbolTable);} Exp RPAREN Statement {CallToExitScope(globalSymbolTable);}                    |
-    BREAK SC                                                                                                                          |
-    CONTINUE SC                                                                                                                       |
-    RETURN SC                                                                                                                         |
-    RETURN Exp SC                                                                                                                     |
+    LBRACE {CallToEnterScope(globalSymbolTable);} Statements {CallToExitScope(globalSymbolTable);} RBRACE        | 
+    Type ID SC               {StatmentAction1(globalSymbolTable,$1,$2,$3);}                                      | 
+    Type ID ASSIGN Exp SC    {StatmentAction2(globalSymbolTable ,$1,$2,$3,$4,$5);}                               | 
+    ID ASSIGN Exp SC         {StatmentAction3(globalSymbolTable,$1,$2,$3,$4);}                                   | 
+    IF_SUFFIX {CallToEnterScope(globalSymbolTable);} %prec "then"                                                |
+    IF_SUFFIX ELSE {CallToEnterScope(globalSymbolTable);} Statement                                              |
+    WHILE LPAREN {CallToEnterScope(globalSymbolTable); EnterWhile(in_while_flag);} Exp RPAREN Statement
+             {CallToExitScope(globalSymbolTable);ExitWhile(in_while_flag);}                                      |
+    BREAK SC                 {StatmentAction4(in_while_flag);}                                                   |
+    CONTINUE SC              {StatmentAction5(in_while_flag);}                                                   |
+    RETURN SC                                                                                                    |
+    RETURN Exp SC                                                                                                |
     Call SC
 ;
 

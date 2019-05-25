@@ -19,6 +19,10 @@ void StatmentAction1(SymbolTable& symTable , Node* node1 , Node* node2, Node* no
 void StatmentAction2(SymbolTable& symTable , Node* node1 , Node* node2, Node* node3, Node* node4, Node* node5);
 //Statment -> ID ASSIGN Exp SC
 void StatmentAction3(SymbolTable& symTable , Node* node1 , Node* node2, Node* node3, Node* node4);
+//Statment -> BREAK SC
+void StatmentAction4(int in_while_flag);
+//Statment -> CONTINUE SC
+void StatmentAction5(int in_while_flag);
 //Statment -> BREAK
 void StatmentAction4(int in_while_flag);
 // Call -> ID LPAREN ExpList RPAREN
@@ -59,5 +63,9 @@ Node* ExpAction13(Node* node1 , Node* node2);
 void CallToEnterScope(SymbolTable& symTable);
 
 void CallToExitScope(SymbolTable& symTable);
+
+void EnterWhile(int &in_while_flag);
+
+void ExitWhile(int &in_while_flag);
 
 #endif

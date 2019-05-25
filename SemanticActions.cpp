@@ -20,6 +20,15 @@ Node* PreConditionsAction2(Node* node1 , Node* node2) {
     return new PreCondListObj(dynamic_cast<PreCondListObj*>(node1));
 }
 
+//PreCondition -> PRECOND LPAREN Exp RPAREN
+
+void PreConditionsAction2(Node* node1 , Node* node2 , Node* node3 , Node* node4) {
+    TypeNameEnum type = ExpToFuncPara(node3);
+    if(type!=TYPE_BOOL){
+        output::errorMismatch(yylineno);
+    }
+}
+
 // Statment -> Type ID SC
 
 void StatmentAction1(SymbolTable& symTable , Node* node1 , Node* node2, Node* node3){
@@ -61,9 +70,18 @@ void StatmentAction3(SymbolTable& symTable , Node* node1 , Node* node2, Node* no
         }
 }
 
-//Statment -> BREAK
+//Statment -> BREAK SC 
 
 void StatmentAction4(int in_while_flag)
+{if(in_while_flag<=0){
+     output::errorUnexpectedBreak(yylineno);
+     yyerror("error!");
+    }
+}
+
+//Statment -> CONTINUE SC
+
+void StatmentAction5(int in_while_flag)
 {if(in_while_flag<=0){
      output::errorUnexpectedBreak(yylineno);
      yyerror("error!");
@@ -253,5 +271,14 @@ void CallToEnterScope(SymbolTable& symTable){
 void CallToExitScope(SymbolTable& symTable){
     output::endScope();
     symTable.ExitScope();
+}
+
+
+void EnterWhile(int &in_while_flag) {
+    in_while_flag++;
+}
+
+void ExitWhile(int &in_while_flag) {
+    in_while_flag--;
 }
 
