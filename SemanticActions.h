@@ -7,12 +7,27 @@
 extern int yylineno;
 extern Node* yylval;
 
-// FuncDecl -> RetType ID LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE
-void CallToPreConditions(Node* node1 , Node* node2 , Node* node3 , Node* node4 , Node* node5 , Node* node6);
+
+// RetType -> TYPE 
+Node * RetTypeAction1(Node * node1);
+// RetType -> VOID 
+Node * RetTypeAction2();
+// Formals -> epsilon
+Node * FormalsAction1();
+// Formals -> FormalsList
+Node * FormalsAction2(Node * node1);
+//FormalsList -> FormalDecl
+Node * FormalsListAction1(Node * node1);
+//FormalsList ->  FormalDecl COMMA FormalsList
+Node * FormalsListAction2(Node * node1 , Node * node2 , Node * node3);
+//FormalDecl -> Type ID
+Node * FormalDeclAction1(SymbolTable& symTable , Node * node1 , Node * node2);
 // PreConditions -> epsilon
 Node* PreConditionsAction1();
 // PreConditions -> PreConditions PreCondition
 Node* PreConditionsAction2(Node* node1 , Node* node2);
+// PreCondition -> PRECOND LPAREN Exp RPAREN
+void PreConditionAction1(Node* node1 , Node* node2 , Node* node3 , Node* node4);
 // Statment -> Type ID SC
 void StatmentAction1(SymbolTable& symTable , Node* node1 , Node* node2, Node* node3);
 // Statment -> Type ID ASSIGN Exp SC
@@ -33,6 +48,12 @@ Node* CallAction2(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node
 Node* ExpListAction1(Node* node1 , Node* node2 , Node* node3);
 //Exp  -> Exp
 Node* ExpListAction2(Node* node1);
+// Type -> INT
+Node* TypeAction1();
+// Type -> BYTE
+Node* TypeAction2();
+// Type -> BOOL
+Node* TypeAction3();
 // Exp -> LPAREN Exp RPAREN
 Node* ExpAction1(Node* node1 , Node* node2 , Node* node3);
 // Exp -> Exp BINOP Exp
@@ -67,5 +88,8 @@ void CallToExitScope(SymbolTable& symTable);
 void EnterWhile(int &in_while_flag);
 
 void ExitWhile(int &in_while_flag);
+
+// Assoiated with : FuncDecl -> RetType ID LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE
+void CallToPreConditions(Node* node1 , Node* node2 , Node* node3 , Node* node4 , Node* node5 , Node* node6);;
 
 #endif

@@ -51,35 +51,37 @@
 %%
 
 Program  : 
-    Funcs // 
+    Funcs // dont need to do anything right now
 ;
 Funcs : 
-    /*epsilon*/ | {CallToEnterScope(globalSymbolTable);} FuncDecl {CallToExitScope(globalSymbolTable);}
+    /*epsilon*/ | {CallToEnterScope(globalSymbolTable);} FuncDecl {CallToExitScope(globalSymbolTable);} Funcs
 ;
 FuncDecl :
-    RetType ID LPAREN Formals RPAREN PreConditions LBRACE {CallToEnterScope(globalSymbolTable);} Statements {CallToExitScope(globalSymbolTable);} RBRACE
-     {CallToPreConditions($1,$2,$3,$4,$5,$6);} 
+    RetType ID {CallToEnterScope(globalSymbolTable);} LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE {CallToExitScope(globalSymbolTable);}
+     {CallToPreConditions($1,$2,$3,$4,$5,$6);} /* TODO: here */
 ;
 
 
 RetType : 
-    Type | VOID
+    Type {$$ = RetTypeAction1($1);} | 
+    VOID {$$ = RetTypeAction2();}
 ;
 Formals : 
-    /*epsilon*/ | FormalsList
+    /*epsilon*/ { $$ = FormalsAction1();} | 
+    FormalsList { $$ = FormalsAction1($1);}
 ;
 FormalsList : 
-    FormalDecl | FormalDecl COMMA FormalsList
+    FormalDecl {$$ = FormalsListAction1($1);} | FormalDecl COMMA FormalsList {$$ = FormalsListAction2($1,$2,$3);}
 ;
 FormalDecl : 
-    Type ID
+    Type ID { $$ = FormalDeclAction1(globalSymbolTable,$1,$2); }
 ;
 PreConditions : 
     /*epsilon*/                { $$ = PreConditionsAction1();}                   |
-    PreConditions PreCondition { $$ = PreConditionsAction2($1,$2);}
+    PreConditions PreCondition { $$ = PreConditionsAction2($1,$2);} 
 ;
 PreCondition : 
-	PRECOND LPAREN Exp RPAREN // dont need to do anything right now
+	PRECOND LPAREN Exp RPAREN { PreConditionAction1($1,$2,$3,$4);}
 ;
 Statements : 
     Statement | Statements Statement // dont need to do anything right now
@@ -104,7 +106,8 @@ IF_SUFFIX : IF LPAREN {CallToEnterScope(globalSymbolTable);} Exp RPAREN Statemen
 ;
 
 Call : 
-    ID LPAREN ExpList RPAREN { $$ = CallAction1(globalSymbolTable,$1,$2,$3,$4); } |
+    ID LPAREN {CallToEnterScope(globalSymbolTable);} ExpList {CallToExitScope(globalSymbolTable);} 
+        RPAREN { $$ = CallAction1(globalSymbolTable,$1,$2,$3,$4); }                                               |
     ID LPAREN RPAREN         { $$ = CallAction2(globalSymbolTable,$1,$2,$3);    }
 ;
 ExpList :
@@ -112,9 +115,9 @@ ExpList :
     Exp               { $$ = new ParaListObj(ExpToFuncPara($1));}
 ;
 Type :
-    INT{ $$ = new Type(TYPE_INT);} |
-     BYTE { $$ = new Type(TYPE_BYTE); } |
-      BOOL { $$ = new Type(TYPE_BOOL); }
+    INT     { $$ = TypeAction1();}  |
+    BYTE    { $$ = TypeAction2(); } |
+    BOOL    { $$ = TypeAction3(); }
 ;
 Exp : 
     LPAREN Exp RPAREN |

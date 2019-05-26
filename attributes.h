@@ -174,13 +174,18 @@ class NonTermVoid : public DataObj {
 class ParaListObj : public Node {
     std::list<TypeNameEnum> paraList;
     public:
+        ParaListObj() {}
         ParaListObj(TypeNameEnum newPara) {
             paraList.push_back(newPara);
         }
         ParaListObj(ParaListObj * oldList , TypeNameEnum newPara) : paraList(oldList->paraList) {
             paraList.push_back(newPara);
         }
+        ParaListObj(ParaListObj * oldList , ParaListObj * anotherListOfOneObj) : paraList(oldList->paraList) {
+            paraList.push_back(anotherListOfOneObj->GetParaList().back());
+        }
         std::list<TypeNameEnum> GetParaList() {return paraList;}
+        int GetParaListSize() {return paraList.size();}
 };
     
 class PreCondListObj : public Node {

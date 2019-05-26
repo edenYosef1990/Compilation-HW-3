@@ -3,10 +3,57 @@
 
 
 
-// FuncDecl -> RetType ID LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE
 
-void CallToPreConditions(Node* node1 , Node* node2 , Node* node3 , Node* node4 , Node* node5 , Node* node6){
-    output::printPreconditions((dynamic_cast<IdVal*>(node2))->GetVal(),(dynamic_cast<PreCondListObj*>(node6))->GetNumCond());
+// RetType -> TYPE 
+
+Node * RetTypeAction1(Node * node1){
+    return node1;
+}
+
+// RetType -> VOID 
+
+Node * RetTypeAction2(){
+    return new Type(TYPE_VOID);
+}
+
+// Formals -> epsilon
+
+Node * FormalsAction1(){
+    return new ParaListObj();
+}
+
+// Formals -> FormalsList
+
+Node * FormalsAction2(Node * node1){
+    return node1;
+}
+
+//FormalsList -> FormalDecl
+
+Node * FormalsListAction1(Node * node1){
+    return node1;
+}
+
+//FormalsList ->  FormalDecl COMMA FormalsList
+
+Node * FormalsListAction2(Node * node1 , Node * node2 , Node * node3){
+    ParaListObj* list1 = dynamic_cast<ParaListObj*>(node1);
+    ParaListObj* list3 = dynamic_cast<ParaListObj*>(node3);
+    return new ParaListObj(list3,list1);
+}
+
+//FormalDecl -> Type ID
+
+Node * FormalDeclAction1(SymbolTable& symTable , Node * node1 , Node * node2){
+    TypeNameEnum type = ExpToFuncPara(node1);
+    std::string name = (dynamic_cast<IdVal*>(node2))->GetVal();
+    Node* returnedNode = symbolNameToExp(symTable.GetTypeOfSymbol(name) , name);
+    if(dynamic_cast<IDNotExists*>(returnedNode) == nullptr){
+        output::errorDef(yylineno,name);
+        yyerror("error!");
+    }
+    symTable.AddVariableSymbol(name , symTable.getCurrentIndex()+1 ,type);
+    return new ParaListObj(type);
 }
 // PreConditions -> epsilon
 
@@ -22,14 +69,13 @@ Node* PreConditionsAction2(Node* node1 , Node* node2) {
 
 //PreCondition -> PRECOND LPAREN Exp RPAREN
 
-void PreConditionsAction2(Node* node1 , Node* node2 , Node* node3 , Node* node4) {
+void PreConditionAction1(Node* node1 , Node* node2 , Node* node3 , Node* node4) {
     TypeNameEnum type = ExpToFuncPara(node3);
     if(type!=TYPE_BOOL){
         output::errorMismatch(yylineno);
     }
 }
-
-// Statment -> Type ID SC
+//Statment -> Type ID SC
 
 void StatmentAction1(SymbolTable& symTable , Node* node1 , Node* node2, Node* node3){
     std::string name = (dynamic_cast<IdVal*>(node2))->IdStr;
@@ -41,7 +87,7 @@ void StatmentAction1(SymbolTable& symTable , Node* node1 , Node* node2, Node* no
         symTable.AddVariableSymbol(name , symTable.getCurrentIndex()+1 ,type);
 }
 
-// Statment -> Type ID ASSIGN Exp SC
+//Statment -> Type ID ASSIGN Exp SC
 
 void StatmentAction2(SymbolTable& symTable , Node* node1 , Node* node2, Node* node3, Node* node4, Node* node5){
     std::string name = (dynamic_cast<IdVal*>(node2))->IdStr;
@@ -140,6 +186,24 @@ Node* CallAction2(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node
         return CallToExp(sym->GetType());
 }
 
+// Type -> INT
+
+Node* TypeAction1(){
+    return new Type(TYPE_INT);
+}
+
+// Type -> BYTE
+
+Node* TypeAction2(){
+    return new Type(TYPE_BYTE);
+}
+
+// Type -> BOOL
+
+Node* TypeAction3(){
+    return new Type(TYPE_BOOL);
+}
+
 // Exp -> LPAREN Exp RPAREN
 
 Node* ExpAction1(Node* node1 , Node* node2 , Node* node3) {
@@ -173,14 +237,14 @@ Node* ExpAction2(Node* node1 , Node* node2 , Node* node3){
 
 Node* ExpAction3(SymbolTable& symTable , Node* arg ){
     std::string name = (dynamic_cast<IdVal*>(yylval))->GetVal();
-        Node* returnedNode = symbolNameToExp(symTable.GetTypeOfSymbol(name) , name);
-        if(dynamic_cast<IDNotExists*>(returnedNode) != nullptr){
-            yyerror("no such variable!");
-        }
-        else if(dynamic_cast<NonTermFunc*>(returnedNode) != nullptr){
-            yyerror("this is the name of a function!");
-        }
-        return returnedNode;
+    Node* returnedNode = symbolNameToExp(symTable.GetTypeOfSymbol(name) , name);
+    if(dynamic_cast<IDNotExists*>(returnedNode) != nullptr){
+        yyerror("no such variable!");
+    }
+    else if(dynamic_cast<NonTermFunc*>(returnedNode) != nullptr){
+        yyerror("this is the name of a function!");
+    }
+    return returnedNode;
 }
 
 // Exp -> Call
@@ -280,5 +344,11 @@ void EnterWhile(int &in_while_flag) {
 
 void ExitWhile(int &in_while_flag) {
     in_while_flag--;
+}
+
+// Assoiated with : FuncDecl -> RetType ID LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE
+
+void CallToPreConditions(Node* node1 , Node* node2 , Node* node3 , Node* node4 , Node* node5 , Node* node6){
+    output::printPreconditions((dynamic_cast<IdVal*>(node2))->GetVal(),(dynamic_cast<PreCondListObj*>(node6))->GetNumCond());
 }
 
