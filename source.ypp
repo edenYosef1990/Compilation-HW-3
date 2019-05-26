@@ -67,8 +67,8 @@ RetType :
     VOID {$$ = RetTypeAction2();}
 ;
 Formals : 
-    /*epsilon*/ { $$ = FormalsAction1();} | 
-    FormalsList { $$ = FormalsAction1($1);}
+    /*epsilon*/ { $$ = FormalsAction1();}                                        | 
+    FormalsList { $$ = FormalsAction2($1);}
 ;
 FormalsList : 
     FormalDecl {$$ = FormalsListAction1($1);} | FormalDecl COMMA FormalsList {$$ = FormalsListAction2($1,$2,$3);}
