@@ -14,6 +14,7 @@
 
     SymbolTable globalSymbolTable;
     int in_while_flag;
+    bool main_flag = false;
 %}
 
 %token VOID
@@ -51,14 +52,18 @@
 %%
 
 Program  : 
-    Funcs // dont need to do anything right now
+    Funcs { GetTypeOfSymbol("main") }// dont need to do anything right now
 ;
 Funcs : 
     /*epsilon*/ | {CallToEnterScope(globalSymbolTable);} FuncDecl {CallToExitScope(globalSymbolTable);} Funcs
 ;
 FuncDecl :
     RetType ID {CallToEnterScope(globalSymbolTable);} LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE {CallToExitScope(globalSymbolTable);}
-     {CallToPreConditions($1,$2,$3,$4,$5,$6);} /* TODO: here */
+     {
+        CallToPreConditions($1,$2,$3,$4,$5,$6); 
+        if(dynamic_cast<IdVal*>($1)->IdStr == "main")
+            main_flag=true; 
+    } /* TODO: here */
 ;
 
 
@@ -144,5 +149,7 @@ int main()
     globalSymbolTable = SymbolTable();
     in_while_flag = 0;
 	yyparse();
+    if(!main_flag)
+        errorMainMissing();
 }
 

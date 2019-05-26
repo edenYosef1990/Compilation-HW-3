@@ -66,6 +66,5 @@ std::vector<string> ParaListToStrings(std::list<TypeNameEnum> paraList){
 
 int yyerror(char const* message)
 {
-	cout<<"eden error: "<<message<<endl;
 	exit(0);
 }

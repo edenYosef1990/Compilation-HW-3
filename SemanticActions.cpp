@@ -50,7 +50,7 @@ Node * FormalDeclAction1(SymbolTable& symTable , Node * node1 , Node * node2){
     Node* returnedNode = symbolNameToExp(symTable.GetTypeOfSymbol(name) , name);
     if(dynamic_cast<IDNotExists*>(returnedNode) == nullptr){
         output::errorDef(yylineno,name);
-        yyerror("error!");
+        yyerror("");
     }
     symTable.AddVariableSymbol(name , symTable.getCurrentIndex()+1 ,type);
     return new ParaListObj(type);
@@ -73,6 +73,7 @@ void PreConditionAction1(Node* node1 , Node* node2 , Node* node3 , Node* node4) 
     TypeNameEnum type = ExpToFuncPara(node3);
     if(type!=TYPE_BOOL){
         output::errorMismatch(yylineno);
+        yyerror("");
     }
 }
 //Statment -> Type ID SC
@@ -82,7 +83,7 @@ void StatmentAction1(SymbolTable& symTable , Node* node1 , Node* node2, Node* no
         TypeNameEnum type = symTable.GetTypeOfSymbol(name);
         if(type != TYPE_NONEXIST){
             output::errorDef(yylineno,(dynamic_cast<IdVal*>(node2))->IdStr);
-            yyerror("error!");
+            yyerror("");
         }
         symTable.AddVariableSymbol(name , symTable.getCurrentIndex()+1 ,type);
 }
@@ -94,11 +95,11 @@ void StatmentAction2(SymbolTable& symTable , Node* node1 , Node* node2, Node* no
         enum TypeNameEnum type = symTable.GetTypeOfSymbol((dynamic_cast<IdVal*>(node2))->IdStr);
         if(type != TYPE_NONEXIST){
             output::errorDef(yylineno,(dynamic_cast<IdVal*>(node2))->IdStr);
-            yyerror("error!");
+            yyerror("");
         }
         if(dynamic_cast<Type*>(node1)->name != dynamic_cast<DataObj*>(node4)->type){
             output::errorMismatch(yylineno);
-            yyerror("error!");
+            yyerror("");
         }
         symTable.AddVariableSymbol(name , symTable.getCurrentIndex()+1 ,type);
 }
