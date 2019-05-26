@@ -31,6 +31,11 @@ Node* CallToExp(TypeNameEnum type){
     return nullptr;
 }
 
+TypeNameEnum TypeNameToTypeEnum(Node * node){
+    Type* typeName = dynamic_cast<Type*>(node);
+    return typeName->name;
+}
+
 TypeNameEnum ExpToFuncPara(Node * node){
     if(dynamic_cast<NonTermBool*>(node)!= nullptr){
         return TYPE_BOOL;
@@ -76,6 +81,5 @@ std::string TypeToString(TypeNameEnum type){
 
 int yyerror(char const* message)
 {
-    cout<<"eden error: "<<message<<endl;
 	exit(0);
 }

@@ -45,12 +45,12 @@ Node * FormalsListAction2(Node * node1 , Node * node2 , Node * node3){
 //FormalDecl -> Type ID
 
 Node * FormalDeclAction1(SymbolTable& symTable , Node * node1 , Node * node2){
-    TypeNameEnum type = ExpToFuncPara(node1);
+    TypeNameEnum type = TypeNameToTypeEnum(node1);
     std::string name = (dynamic_cast<IdVal*>(node2))->GetVal();
     Node* returnedNode = symbolNameToExp(symTable.GetTypeOfSymbol(name) , name);
     if(dynamic_cast<IDNotExists*>(returnedNode) == nullptr){
         output::errorDef(yylineno,name);
-        yyerror("");
+        yyerror("error!");
     }
     symTable.AddVariableSymbol(name , symTable.getCurrentIndex()+1 ,type);
     return new ParaListObj(type);
@@ -64,6 +64,7 @@ Node* PreConditionsAction1() {
 // PreConditions -> PreConditions PreCondition
 
 Node* PreConditionsAction2(Node* node1 , Node* node2) {
+    std::cout << std::endl << "here3" << std::endl;
     return new PreCondListObj(dynamic_cast<PreCondListObj*>(node1));
 }
 
@@ -82,9 +83,10 @@ void StatmentAction1(SymbolTable& symTable , Node* node1 , Node* node2, Node* no
     std::string name = (dynamic_cast<IdVal*>(node2))->IdStr;
         TypeNameEnum type = symTable.GetTypeOfSymbol(name);
         if(type != TYPE_NONEXIST){
-            output::errorDef(yylineno,(dynamic_cast<IdVal*>(node2))->IdStr);
+            output::errorDef(yylineno,(dynamic_cast<IdVal*>(node2))->IdStr); // already exists in the symbol table
             yyerror("");
         }
+        type = TypeNameToTypeEnum(node1);
         symTable.AddVariableSymbol(name , symTable.getCurrentIndex()+1 ,type);
 }
 
@@ -94,13 +96,14 @@ void StatmentAction2(SymbolTable& symTable , Node* node1 , Node* node2, Node* no
     std::string name = (dynamic_cast<IdVal*>(node2))->IdStr;
         enum TypeNameEnum type = symTable.GetTypeOfSymbol((dynamic_cast<IdVal*>(node2))->IdStr);
         if(type != TYPE_NONEXIST){
-            output::errorDef(yylineno,(dynamic_cast<IdVal*>(node2))->IdStr);
+            output::errorDef(yylineno,(dynamic_cast<IdVal*>(node2))->IdStr); // alrady exists in the symbol table
             yyerror("");
         }
-        if(dynamic_cast<Type*>(node1)->name != dynamic_cast<DataObj*>(node4)->type){
+        if(dynamic_cast<Type*>(node1)->name != dynamic_cast<DataObj*>(node4)->type){ // mismatch
             output::errorMismatch(yylineno);
             yyerror("");
         }
+        type = TypeNameToTypeEnum(node1);
         symTable.AddVariableSymbol(name , symTable.getCurrentIndex()+1 ,type);
 }
 
@@ -108,10 +111,10 @@ void StatmentAction2(SymbolTable& symTable , Node* node1 , Node* node2, Node* no
 void StatmentAction3(SymbolTable& symTable , Node* node1 , Node* node2, Node* node3, Node* node4){
      enum TypeNameEnum type = symTable.GetTypeOfSymbol((dynamic_cast<IdVal*>(node1))->IdStr);
         if(type == TYPE_NONEXIST){
-            output::errorUndef(yylineno, (dynamic_cast<IdVal*>(node1))->IdStr);
+            output::errorUndef(yylineno, (dynamic_cast<IdVal*>(node1))->IdStr); // not exists in the symbol table
             yyerror("error!");
         }
-        if(type != dynamic_cast<DataObj*>(node3)->type){
+        if(type != dynamic_cast<DataObj*>(node3)->type){ // mismatch
             output::errorMismatch(yylineno);
             yyerror("error!");
         }
@@ -356,10 +359,12 @@ void ExitWhile(int &in_while_flag) {
     in_while_flag--;
 }
 
-// Assoiated with : FuncDecl -> RetType ID LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE
+// Assoiated with : FuncDecl -> RetType ID <MARKER> LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE
 
-void CallToPreConditions(Node* node1 , Node* node2 , Node* node3 , Node* node4 , Node* node5 , Node* node6){
-    output::printPreconditions((dynamic_cast<IdVal*>(node2))->GetVal(),(dynamic_cast<PreCondListObj*>(node6))->GetNumCond());
+void CallToPreConditions(Node* node1 , Node* node2 , Node* node3 , Node* node4 , Node* node5 , Node* node6 , Node* node7){
+    std::string name = (dynamic_cast<IdVal*>(node2))->GetVal();
+    int num = (node7 != nullptr) ? (dynamic_cast<PreCondListObj*>(node7))->GetNumCond() : 0;
+    output::printPreconditions(name,num);
 }
 
 void CallToPrintIDsInScope(SymbolTable& symTable , Node * paraList){
@@ -378,6 +383,7 @@ void CallToPrintIDsInScope(SymbolTable& symTable , Node * paraList){
             else if(i=numParas){
                 j=0;
                 output::printID((*it_scope)->GetName(),j,TypeToString((*it_scope)->GetType()));
+                i++;
             }
             else{
                 j++;

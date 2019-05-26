@@ -219,6 +219,8 @@ std::vector<string> CallToRetType(std::list<TypeNameEnum> paraList1);
 
 std::string TypeToString(TypeNameEnum type);
 
+TypeNameEnum TypeNameToTypeEnum(Node * node);
+
 int yyerror(char const* message);
 
 #define YYSTYPE Node*

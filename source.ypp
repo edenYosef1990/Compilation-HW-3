@@ -52,14 +52,14 @@
 %%
 
 Program  : 
-    Funcs { GetTypeOfSymbol("main") }// dont need to do anything right now
+    Funcs
 ;
 Funcs : 
-    /*epsilon*/ | {CallToEnterScope(globalSymbolTable);} FuncDecl {CallToExitScope(globalSymbolTable);} Funcs
+    /*epsilon*/ | FuncDecl Funcs
 ;
 FuncDecl :
-    RetType ID {CallToEnterScope(globalSymbolTable);} LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE {CallToExitScope(globalSymbolTable);}
-     {CallToPreConditions($1,$2,$3,$4,$5,$6);} {CallToExitScope(globalSymbolTable,$5);}
+    RetType ID {CallToEnterScope(globalSymbolTable);} LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE
+     {CallToPreConditions($1,$2,$3,$4,$5,$6,$7);} {CallToExitScope(globalSymbolTable,$5);}
 ;
 
 
@@ -145,7 +145,7 @@ int main()
     globalSymbolTable = SymbolTable();
     in_while_flag = 0;
 	yyparse();
-    if(!main_flag)
-        errorMainMissing();
+    //if(!main_flag)
+    //    errorMainMissing();
 }
 

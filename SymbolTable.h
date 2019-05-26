@@ -13,7 +13,9 @@ class Symbol {
     int SymbolIndex; 
     TypeNameEnum Type;
     public:
-        Symbol(std::string _symbolName , int _symbolIndex , TypeNameEnum type) : SymbolName(_symbolName) , SymbolIndex(_symbolIndex) , Type(type) {}
+        Symbol(std::string _symbolName , int _symbolIndex , TypeNameEnum type) : SymbolName(_symbolName) , SymbolIndex(_symbolIndex) , Type(type) {
+            
+        }
         Symbol(const Symbol& Sym) = default;
         std::string GetName() {return SymbolName;}
         int GetIndex() {return SymbolIndex;}

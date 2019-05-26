@@ -91,7 +91,7 @@ void EnterWhile(int &in_while_flag);
 void ExitWhile(int &in_while_flag);
 
 // Assoiated with : FuncDecl -> RetType ID LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE
-void CallToPreConditions(Node* node1 , Node* node2 , Node* node3 , Node* node4 , Node* node5 , Node* node6);
+void CallToPreConditions(Node* node1 , Node* node2 , Node* node3 , Node* node4 , Node* node5 , Node* node6, Node* node7);
 
 void CallToPrintIDsInScope(SymbolTable& symTable , Node * paraList);
 
