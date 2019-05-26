@@ -76,6 +76,6 @@ std::string TypeToString(TypeNameEnum type){
 
 int yyerror(char const* message)
 {
-	cout<<"eden error: "<<message<<endl;
+    cout<<"eden error: "<<message<<endl;
 	exit(0);
 }

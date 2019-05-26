@@ -14,6 +14,7 @@
 
     SymbolTable globalSymbolTable;
     int in_while_flag;
+    bool main_flag = false;
 %}
 
 %token VOID
@@ -51,7 +52,7 @@
 %%
 
 Program  : 
-    Funcs // dont need to do anything right now
+    Funcs { GetTypeOfSymbol("main") }// dont need to do anything right now
 ;
 Funcs : 
     /*epsilon*/ | {CallToEnterScope(globalSymbolTable);} FuncDecl {CallToExitScope(globalSymbolTable);} Funcs
@@ -144,5 +145,7 @@ int main()
     globalSymbolTable = SymbolTable();
     in_while_flag = 0;
 	yyparse();
+    if(!main_flag)
+        errorMainMissing();
 }
 
