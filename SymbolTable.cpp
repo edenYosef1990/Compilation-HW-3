@@ -68,6 +68,10 @@ Symbol* SymbolTable::GetSymbol(std::string name){
     return nullptr;
 }
 
+std::list<Symbol*> SymbolTable::GetCurrentScope(){
+    return ScopesList.back();
+}
+
 
 
 

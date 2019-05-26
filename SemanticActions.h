@@ -7,7 +7,6 @@
 extern int yylineno;
 extern Node* yylval;
 
-
 // RetType -> TYPE 
 Node * RetTypeAction1(Node * node1);
 // RetType -> VOID 
@@ -85,11 +84,17 @@ void CallToEnterScope(SymbolTable& symTable);
 
 void CallToExitScope(SymbolTable& symTable);
 
+void CallToExitScope(SymbolTable& symTable , Node* paraList);
+
 void EnterWhile(int &in_while_flag);
 
 void ExitWhile(int &in_while_flag);
 
 // Assoiated with : FuncDecl -> RetType ID LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE
-void CallToPreConditions(Node* node1 , Node* node2 , Node* node3 , Node* node4 , Node* node5 , Node* node6);;
+void CallToPreConditions(Node* node1 , Node* node2 , Node* node3 , Node* node4 , Node* node5 , Node* node6);
+
+void CallToPrintIDsInScope(SymbolTable& symTable , Node * paraList);
+
+void CallToPrintIDsInScope(SymbolTable& symTable);
 
 #endif

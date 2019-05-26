@@ -64,6 +64,16 @@ std::vector<string> ParaListToStrings(std::list<TypeNameEnum> paraList){
 
 }
 
+std::string TypeToString(TypeNameEnum type){
+    switch(type){
+            case TYPE_INT: return std::string("Int"); break;
+            case TYPE_BYTE: return std::string("Byte"); break;
+            case TYPE_BOOL: return std::string("Bool"); break;
+            case TYPE_STR: return std::string("String"); break;
+            }
+    return "none";
+}
+
 int yyerror(char const* message)
 {
 	cout<<"eden error: "<<message<<endl;

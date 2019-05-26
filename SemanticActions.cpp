@@ -328,12 +328,21 @@ Node* ExpAction13(Node* node1 , Node* node2){
     return new NonTermBool();
 }
 
+//=================================== Handling Home Work's Special Functions ===============================================
+
 void CallToEnterScope(SymbolTable& symTable){
     symTable.EnterScope();
 }
 
 void CallToExitScope(SymbolTable& symTable){
     output::endScope();
+    CallToPrintIDsInScope(symTable);
+    symTable.ExitScope();
+}
+
+void CallToExitScope(SymbolTable& symTable , Node* paraList){
+    output::endScope();
+    CallToPrintIDsInScope(symTable,paraList);
     symTable.ExitScope();
 }
 
@@ -350,5 +359,38 @@ void ExitWhile(int &in_while_flag) {
 
 void CallToPreConditions(Node* node1 , Node* node2 , Node* node3 , Node* node4 , Node* node5 , Node* node6){
     output::printPreconditions((dynamic_cast<IdVal*>(node2))->GetVal(),(dynamic_cast<PreCondListObj*>(node6))->GetNumCond());
+}
+
+void CallToPrintIDsInScope(SymbolTable& symTable , Node * paraList){
+    ParaListObj* list = dynamic_cast<ParaListObj*>(paraList);
+    int numParas = list->GetParaListSize();
+    std::list<Symbol*> IDList = symTable.GetCurrentScope();
+    int i=0;
+    int j=0;
+    for(std::list<Symbol*>::iterator it_scope = IDList.begin() ; 
+        it_scope != IDList.end() ; it_scope++){
+            if(i<numParas){
+                j--;
+                output::printID((*it_scope)->GetName(),j,TypeToString((*it_scope)->GetType()));
+                i++;
+            }
+            else if(i=numParas){
+                j=0;
+                output::printID((*it_scope)->GetName(),j,TypeToString((*it_scope)->GetType()));
+            }
+            else{
+                j++;
+                output::printID((*it_scope)->GetName(),j,TypeToString((*it_scope)->GetType()));
+            }
+        }
+
+}
+
+void CallToPrintIDsInScope(SymbolTable& symTable){
+    std::list<Symbol*> IDList = symTable.GetCurrentScope();
+    for(std::list<Symbol*>::iterator it_scope = IDList.begin() ; 
+        it_scope != IDList.end() ; it_scope++){
+            output::printID((*it_scope)->GetName(),(*it_scope)->GetIndex(),TypeToString((*it_scope)->GetType()));
+        }
 }
 
