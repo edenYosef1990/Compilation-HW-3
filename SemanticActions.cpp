@@ -380,7 +380,7 @@ void CallToPrintIDsInScope(SymbolTable& symTable , Node * paraList){
                 output::printID((*it_scope)->GetName(),j,TypeToString((*it_scope)->GetType()));
                 i++;
             }
-            else if(i=numParas){
+            else if(i==numParas){
                 j=0;
                 output::printID((*it_scope)->GetName(),j,TypeToString((*it_scope)->GetType()));
                 i++;
