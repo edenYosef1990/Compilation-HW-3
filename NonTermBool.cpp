@@ -17,6 +17,15 @@ bool NonTermBool::IsValidBoolExp(Node * node1, Node * node2 , Node * node3){
     return true;
 }
 
+bool NonTermBool::IsValidBoolExpRelExp(Node * node1, Node * node2 , Node * node3){
+    TypeNameEnum type1 = ExpToTypeName(node1);
+    TypeNameEnum type2 = ExpToTypeName(node3);
+    if(!(type1 == TYPE_INT || type1 == TYPE_BYTE) || !(type2 == TYPE_INT || type2 == TYPE_BYTE)){
+        return false;
+    }
+    return true;
+}
+
 bool NonTermBool::IsValidBoolExp(Node * node){
     
     return true;

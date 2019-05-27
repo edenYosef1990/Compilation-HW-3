@@ -5,6 +5,7 @@
 #include "list"
 #include "string"
 #include "typeEnums.h"
+#include <iostream>
 
 using namespace std;
 
@@ -55,6 +56,7 @@ class SymbolTable {
         //TypeNameEnum GetTypeOfSymbol(std::string name);
         Symbol* GetSymbol(std::string name);
         std::list<Symbol*> GetCurrentScope();
+        void printTable();
 };
 
 #endif

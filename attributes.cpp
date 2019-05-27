@@ -31,10 +31,10 @@ TypeNameEnum ExpToTypeName(Node * node){
         return TYPE_BOOL;
     }
     else if(dynamic_cast<NonTermInt*>(node)!= nullptr){
-        return TYPE_BOOL;
+        return TYPE_INT;
     }
     else if(dynamic_cast<NonTermStr*>(node)!= nullptr){
-        return TYPE_BOOL;
+        return TYPE_STR;
     }
     else if(dynamic_cast<NonTermByte*>(node)!= nullptr){
         return TYPE_BYTE;
@@ -61,10 +61,10 @@ std::vector<string> ParaListToStrings(std::list<TypeNameEnum> paraList){
 
 std::string TypeToString(TypeNameEnum type){
     switch(type){
-            case TYPE_INT: return std::string("Int"); break;
-            case TYPE_BYTE: return std::string("Byte"); break;
-            case TYPE_BOOL: return std::string("Bool"); break;
-            case TYPE_STR: return std::string("String"); break;
+            case TYPE_INT: return std::string("INT"); break;
+            case TYPE_BYTE: return std::string("BYTE"); break;
+            case TYPE_BOOL: return std::string("BOOL"); break;
+            case TYPE_STR: return std::string("STRING"); break;
             }
     return "none";
 }

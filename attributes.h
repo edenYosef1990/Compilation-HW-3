@@ -118,6 +118,7 @@ class NonTermBool : public DataObj {
     public:
     static bool IsValidBoolExp(Node * node);
     static bool IsValidBoolExp(Node * node1, Node * node2 , Node * node3);
+    static bool IsValidBoolExpRelExp(Node * node1, Node * node2 , Node * node3);
     NonTermBool();
     NonTermBool(std::string name);
     bool IsItVar() {return IsItVar();}

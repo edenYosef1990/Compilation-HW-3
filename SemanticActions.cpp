@@ -139,7 +139,6 @@ void StatmentAction5(int in_while_flag)
     }
 }
 
-
 //ExpList -> Exp COMMA ExpList 
 
 Node* ExpListAction1(Node* node1 , Node* node2 , Node* node3) {
@@ -148,29 +147,42 @@ Node* ExpListAction1(Node* node1 , Node* node2 , Node* node3) {
         return new ParaListObj(paralist,type);
 } 
 
-//Exp
+//ExpList -> Exp
 
-Node* ExpListAction2(Node* node1) { 
-     return new ParaListObj(ExpToTypeName(node1));
+Node* ExpListAction2(Node* node1){
+    TypeNameEnum type = ExpToTypeName(node1);
+    return new ParaListObj(ExpToTypeName(node1));
 }
-
 
 // Call -> ID LPAREN ExpList RPAREN
 
 Node* CallAction1(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3 , Node* node4){
     Symbol * sym = symTable.GetSymbol((dynamic_cast<IdVal*>(node1))->IdStr);
-        if(sym == nullptr || sym->GetType() != TYPE_FUNC ){
-            output::errorUndefFunc(yylineno,(dynamic_cast<IdVal*>(node1))->IdStr);
-            yyerror("error!");
-        }
-        std::list<TypeNameEnum> symParas = (dynamic_cast<FunctionSymbol*>(sym))->GetParametersList(); 
-        std::list<TypeNameEnum> expListparas = (dynamic_cast<ParaListObj*>(node3))->GetParaList();
-        std::vector<string> vector_symParas = ParaListToStrings(symParas);
-        if(symParas != expListparas){
-            output::errorPrototypeMismatch(yylineno,(dynamic_cast<IdVal*>(node1))->IdStr,vector_symParas);
-            yyerror("error!");
-        }
-        return TypeNameToExp(sym->GetType());
+    if(sym == nullptr || sym->GetType() != TYPE_FUNC ){
+        output::errorUndefFunc(yylineno,(dynamic_cast<IdVal*>(node1))->IdStr);
+        yyerror("error!");
+    }
+    std::list<TypeNameEnum> symParas = (dynamic_cast<FunctionSymbol*>(sym))->GetParametersList();
+    std::list<TypeNameEnum> expListparas = (dynamic_cast<ParaListObj*>(node3))->GetParaList();
+    std::vector<string> vector_symParas = ParaListToStrings(symParas);
+    /*std::vector<string> list1 = ParaListToStrings(symParas);
+    std::vector<string> list2 = ParaListToStrings(expListparas);
+    std::cout << "start" << std::endl;
+    for(std::vector<string>::iterator it = list1.begin() ; it != list1.end() ; it++){
+        std::cout << std::endl << "type : " << (*it) << std::endl;
+    }
+    std::cout << "end" << std::endl;
+    std::cout << "start" << std::endl;
+    for(std::vector<string>::iterator it = list2.begin() ; it != list2.end() ; it++){
+        std::cout << std::endl << "type : " << (*it) << std::endl;
+    }
+    std::cout << "end" << std::endl;*/
+    if(symParas != expListparas){
+        output::errorPrototypeMismatch(yylineno,(dynamic_cast<IdVal*>(node1))->IdStr,vector_symParas);
+        yyerror("error!");
+    }
+    FunctionSymbol* funcSym = dynamic_cast<FunctionSymbol*>(sym);
+    return TypeNameToExp(funcSym->GetRetType());
 }
 
 // Call -> ID LPAREN RPAREN
@@ -316,7 +328,7 @@ Node* ExpAction11(Node* node1 , Node* node2 , Node* node3){
 // Exp -> Exp RELOP Exp
 
 Node* ExpAction12(Node* node1 , Node* node2 , Node* node3){
-    if(!(NonTermBool::IsValidBoolExp(node1,node2,node3)))
+    if(!(NonTermBool::IsValidBoolExpRelExp(node1,node2,node3)))
         {
             output::errorMismatch(yylineno);
              yyerror("error!");
@@ -367,10 +379,14 @@ void CallToExitScopeWithPreConds(SymbolTable& symTable , Node* node1 , Node* nod
         Node* node4 , Node* node5 , Node* node6 , Node* node7){
     output::endScope();
     std::string name = (dynamic_cast<IdVal*>(node2))->GetVal();
+    TypeNameEnum type = (dynamic_cast<Type*>(node1))->name;
+
     int num = (node7 != nullptr) ? (dynamic_cast<PreCondListObj*>(node7))->GetNumCond() : 0;
     output::printPreconditions(name,num);
     CallToPrintIDsInScope(symTable,node5);
+    std::list<TypeNameEnum> typesList = (dynamic_cast<ParaListObj*>(node5))->GetParaList();
     symTable.ExitScope();
+    symTable.AddFuncSymbol(name,0,TYPE_FUNC,typesList,type);
 }
 
 void CallToPrintIDsInScope(SymbolTable& symTable , Node * paraList){

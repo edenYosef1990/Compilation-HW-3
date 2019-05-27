@@ -45,7 +45,7 @@ Node* CallAction1(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node
 Node* CallAction2(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3);
 //ExpList -> Exp COMMA ExpList 
 Node* ExpListAction1(Node* node1 , Node* node2 , Node* node3);
-//Exp  -> Exp
+//ExpList -> Exp
 Node* ExpListAction2(Node* node1);
 // Type -> INT
 Node* TypeAction1();

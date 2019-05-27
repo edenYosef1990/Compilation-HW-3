@@ -2,6 +2,12 @@
 
 SymbolTable::SymbolTable() : ScopesList(), CurrentScopeLevel(0) ,CurrentIndexInScope(0) {
     ScopesList.push_back(std::list<Symbol*>());
+    std::list<TypeNameEnum> typesList1 = std::list<TypeNameEnum>();
+    typesList1.push_back(TYPE_STR);
+    AddFuncSymbol("print",0,TYPE_FUNC,typesList1,TYPE_VOID);
+    std::list<TypeNameEnum> typesList2 = std::list<TypeNameEnum>();
+    typesList2.push_back(TYPE_INT);
+    AddFuncSymbol("printi",0,TYPE_FUNC,typesList2,TYPE_VOID);
 }
 
 void SymbolTable::EnterScope() {
@@ -32,19 +38,6 @@ void SymbolTable::AddFuncSymbol(std::string name , int index , TypeNameEnum type
     ScopesList.back().push_back(new FunctionSymbol(name,index,type,parametersList,retType));  // sould be changed for Functions!
 }
 
-/*TypeNameEnum SymbolTable::GetTypeOfSymbol(std::string name){
-    for(std::list<std::list<Symbol*>>::iterator it_scopes = ScopesList.begin() ; 
-        it_scopes != ScopesList.end() ; it_scopes++){
-            for(std::list<Symbol*>::iterator it_scope = it_scopes->begin() ; 
-                it_scope != it_scopes->end() ; it_scope++) {
-                    if((*it_scope)->GetName() == name){
-                        return (*it_scope)->GetType();
-                    }
-                }
-        }
-    return TYPE_NONEXIST;
-}*/
-
 Symbol* SymbolTable::GetSymbol(std::string name){
     for(std::list<std::list<Symbol*>>::iterator it_scopes = ScopesList.begin() ; 
         it_scopes != ScopesList.end() ; it_scopes++){
@@ -66,6 +59,16 @@ Symbol* SymbolTable::GetSymbol(std::string name){
                 }
         }
     return nullptr;
+}
+
+void SymbolTable::printTable(){
+     for(std::list<std::list<Symbol*>>::iterator it_scopes = ScopesList.begin() ; 
+        it_scopes != ScopesList.end() ; it_scopes++){
+            for(std::list<Symbol*>::iterator it_scope = it_scopes->begin() ; 
+                it_scope != it_scopes->end() ; it_scope++) {
+                    std::cout << "symbol name: " << (*it_scope)->GetName() << std::endl;
+                }
+        }
 }
 
 std::list<Symbol*> SymbolTable::GetCurrentScope(){
