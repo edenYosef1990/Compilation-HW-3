@@ -37,8 +37,10 @@ void StatmentAction3(SymbolTable& symTable , Node* node1 , Node* node2, Node* no
 void StatmentAction4(int in_while_flag);
 //Statment -> CONTINUE SC
 void StatmentAction5(int in_while_flag);
-//Statment -> BREAK
-void StatmentAction4(int in_while_flag);
+//Statment -> RETURN SC
+void StatmentAction6(SymbolTable& symTable);
+//Statment -> RETURN Exp SC
+void StatmentAction7(SymbolTable& symTable , Node * node1 , Node * node2);
 // Call -> ID LPAREN ExpList RPAREN
 Node* CallAction1(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3 , Node* node4);
 // Call -> ID LPAREN RPAREN
@@ -97,5 +99,7 @@ void CallToExitScopeWithPreConds(SymbolTable& symTable , Node* node1 , Node* nod
 void CallToPrintIDsInScope(SymbolTable& symTable , Node * paraList);
 
 void CallToPrintIDsInScope(SymbolTable& symTable);
+
+void checkMainRetValueAndParam(Node* node1, Node* node2, Node* node3);
 
 #endif

@@ -43,6 +43,7 @@ class FunctionSymbol : public Symbol {
 
 class SymbolTable {
     bool isThereMain;
+    TypeNameEnum CurrentRetType;
     std::list<std::list<Symbol*>> ScopesList;
     int CurrentScopeLevel;
     int CurrentIndexInScope;
@@ -57,6 +58,8 @@ class SymbolTable {
         //TypeNameEnum GetTypeOfSymbol(std::string name);
         void FoundMainFunc();
         bool IsMainExists();
+        void SetCurrentRetType(Node* node);
+        TypeNameEnum GetCurrentRetType();
         Symbol* GetSymbol(std::string name);
         std::list<Symbol*> GetCurrentScope();
         void printTable();

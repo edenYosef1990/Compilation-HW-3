@@ -1,6 +1,6 @@
 #include "SymbolTable.h"
 
-SymbolTable::SymbolTable() : isThereMain(false), ScopesList(), CurrentScopeLevel(0) ,CurrentIndexInScope(0) {
+SymbolTable::SymbolTable() : isThereMain(false), CurrentRetType(TYPE_NONEXIST) , ScopesList(), CurrentScopeLevel(0) ,CurrentIndexInScope(0) {
     ScopesList.push_back(std::list<Symbol*>());
     std::list<TypeNameEnum> typesList1 = std::list<TypeNameEnum>();
     typesList1.push_back(TYPE_STR);
@@ -8,6 +8,14 @@ SymbolTable::SymbolTable() : isThereMain(false), ScopesList(), CurrentScopeLevel
     std::list<TypeNameEnum> typesList2 = std::list<TypeNameEnum>();
     typesList2.push_back(TYPE_INT);
     AddFuncSymbol("printi",0,TYPE_FUNC,typesList2,TYPE_VOID);
+}
+
+void SymbolTable::SetCurrentRetType(Node* node){
+    CurrentRetType = TypeNameToTypeEnum(node);
+}
+
+TypeNameEnum SymbolTable::GetCurrentRetType(){
+    return CurrentRetType;
 }
 
 void SymbolTable::EnterScope() {

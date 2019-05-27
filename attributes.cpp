@@ -1,4 +1,7 @@
 #include "attributes.h"
+#include "output.hpp"
+
+extern int yylineno;
 
 bool IsItConstOrExistingSymbol(DataObj * dataObject){
     if(!(dataObject->IsItVar())){
@@ -71,6 +74,6 @@ std::string TypeToString(TypeNameEnum type){
 
 int yyerror(char const* message)
 {
-    std::cout << message <<std::endl;
+    output::errorSyn(yylineno);
 	exit(0);
 }

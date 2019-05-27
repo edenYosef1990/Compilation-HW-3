@@ -1,3 +1,25 @@
-void printOk(bool isOk) {
-    if (isOk) print("ok");
+bool preFunc(int x, int y)
+@pre (x >= 1)
+@pre(y >= 1)
+{
+    return x < y;
 }
+
+void main() {
+    int a = 5;
+    byte bb = 30 b;
+    int cc = bb + a;
+    bool c = true;
+    if (not c) {
+        int x = 6;
+        printi(x);
+    }
+}
+
+int return6()
+@pre(preFunc(1, 2))
+{
+    return 6;
+}
+
+

@@ -103,7 +103,8 @@ void StatmentAction2(SymbolTable& symTable , Node* node1 , Node* node2, Node* no
         exit(0);
         //yyerror("");
     }
-    if(dynamic_cast<Type*>(node1)->name != dynamic_cast<DataObj*>(node4)->type){ // mismatch
+    if(dynamic_cast<Type*>(node1)->name != ExpToTypeName(node4) &&
+        !(dynamic_cast<Type*>(node1)->name == TYPE_INT && ExpToTypeName(node4) == TYPE_BYTE)){ // mismatch
         output::errorMismatch(yylineno);
         exit(0);
         //yyerror("");
@@ -122,7 +123,8 @@ void StatmentAction3(SymbolTable& symTable , Node* node1 , Node* node2, Node* no
         //yyerror("error!");
     }
     TypeNameEnum type = sym->GetType();
-    if(type != dynamic_cast<DataObj*>(node3)->type){ // mismatch
+    if((type != ExpToTypeName(node3)) &&
+     !(type == TYPE_INT && ExpToTypeName(node3)== TYPE_BYTE)){ // mismatch
         output::errorMismatch(yylineno);
         exit(0);
         //yyerror("error!");
@@ -146,6 +148,25 @@ void StatmentAction5(int in_while_flag){
      output::errorUnexpectedBreak(yylineno);
      exit(0);
      //yyerror("error!");
+    }
+}
+
+//Statment -> RETURN SC
+
+void StatmentAction6(SymbolTable& symTable){
+    if(!(symTable.GetCurrentRetType()==TYPE_VOID)){
+        output::errorMismatch(yylineno);
+        exit(0);
+    }
+}
+
+//Statment -> RETURN Exp SC
+
+void StatmentAction7(SymbolTable& symTable , Node * node1 , Node * node2){
+    TypeNameEnum type = ExpToTypeName(node2);
+    if(!(symTable.GetCurrentRetType()==type)){
+        output::errorMismatch(yylineno);
+        exit(0);
     }
 }
 
@@ -275,12 +296,11 @@ Node* ExpAction2(Node* node1 , Node* node2 , Node* node3){
     TypeNameEnum node1Type = ExpToTypeName(node1);
     TypeNameEnum node2Type = ExpToTypeName(node3);
     if((node1Type != TYPE_INT && node1Type != TYPE_BYTE)
-        | (node2Type != TYPE_INT && node2Type != TYPE_BYTE) ){
+        || (node2Type != TYPE_INT && node2Type != TYPE_BYTE) ){
             output::errorMismatch(yylineno);
             exit(0);
-            //yyerror("error!");
         }
-    if(node1Type==TYPE_INT | node2Type==TYPE_INT ){
+    if(node1Type==TYPE_INT || node2Type==TYPE_INT ){
         return TypeNameToExp(TYPE_INT);
     }
     else{
@@ -426,6 +446,18 @@ void ExitWhile(int &in_while_flag) {
 }
 
 // Assoiated with : FuncDecl -> RetType ID <MARKER> LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE
+
+void checkMainRetValueAndParam(Node* node1, Node* node2, Node* node3){
+    std::string name = (dynamic_cast<IdVal*>(node2))->GetVal();
+    TypeNameEnum type = (dynamic_cast<Type*>(node1))->name;
+    std::list<TypeNameEnum> typesList = (dynamic_cast<ParaListObj*>(node3))->GetParaList();
+    if(name == "main"){
+        if (type != TYPE_VOID || typesList.size() != 0){
+            output::errorMainMissing();
+            exit(0);
+        }
+    }
+}
 
 void CallToExitScopeWithPreConds(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3 ,
         Node* node4 , Node* node5 , Node* node6 , Node* node7){

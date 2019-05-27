@@ -59,8 +59,9 @@ Funcs :
     /*epsilon*/ | FuncDecl Funcs | COMMENT Funcs
 ;
 FuncDecl :
-    RetType ID {CallToEnterScope(globalSymbolTable);} LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE
-     {CallToExitScopeWithPreConds(globalSymbolTable,$1,$2,$3,$4,$5,$6,$7);}
+    RetType ID {globalSymbolTable.SetCurrentRetType($1);CallToEnterScope(globalSymbolTable);}
+     LPAREN Formals RPAREN {checkMainRetValueAndParam($1, $2, $5); } PreConditions LBRACE Statements RBRACE
+     {CallToExitScopeWithPreConds(globalSymbolTable,$1,$2,$3,$4,$5,$6,$8);}
 ;
 
 
@@ -99,8 +100,8 @@ Statement :
              {CallToExitScope(globalSymbolTable);ExitWhile(in_while_flag);}                                      |
     BREAK SC                 {StatmentAction4(in_while_flag);}                                                   |
     CONTINUE SC              {StatmentAction5(in_while_flag);}                                                   |
-    RETURN SC                                                                                                    |
-    RETURN Exp SC                                                                                                |
+    RETURN SC                {StatmentAction6(globalSymbolTable);}                                               |
+    RETURN Exp SC            {StatmentAction7(globalSymbolTable,$1,$2);}                                         |
     Call SC
 ;
 

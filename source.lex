@@ -1,5 +1,6 @@
 %{
 	#include "attributes.h"
+	#include "output.hpp"
 	#include "source.tab.hpp"
 %}
 
@@ -42,6 +43,6 @@ continue          				{yylval = new CmdWord(CMD_CONTINUE); return CONTINUE;}
 \"([^\n\r\"\\]|\\[rnt"\\])+\"   {yylval = new StrVal(yytext); return STRING;}
 \/\/[^\r\n]*[\r|\n|\r\n]?    	{yylval = new StrVal(yytext); return COMMENT;}
 {whitespace}			;
-.		                printf("Lex doesn't know what that is!\n");
+.		                {output::errorLex(yylineno); exit(0);}
 
 %%
