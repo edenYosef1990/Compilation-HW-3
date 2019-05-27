@@ -9,7 +9,9 @@ this->type = TYPE_BOOL;
 }
 
 bool NonTermBool::IsValidBoolExp(Node * node1, Node * node2 , Node * node3){
-    if(dynamic_cast<NonTermBool*>(node1) == nullptr || dynamic_cast<NonTermBool*>(node3) == nullptr){
+    TypeNameEnum type1 = ExpToTypeName(node1);
+    TypeNameEnum type2 = ExpToTypeName(node3);
+    if(type1 != TYPE_BOOL || type2 != TYPE_BOOL){
         return false;
     }
     return true;

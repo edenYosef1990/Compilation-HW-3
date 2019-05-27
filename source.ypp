@@ -113,7 +113,7 @@ Call :
 ;
 ExpList :
     Exp COMMA ExpList {$$ = ExpListAction1($1,$2,$3);}              | 
-    Exp               { $$ = new ParaListObj(ExpToFuncPara($1));}
+    Exp               { $$ = new ParaListObj(ExpToTypeName($1));}
 ;
 Type :
     INT     { $$ = TypeAction1();}  |
@@ -121,19 +121,21 @@ Type :
     BOOL    { $$ = TypeAction3(); }
 ;
 Exp : 
-    LPAREN Exp RPAREN |
-    Exp BINOP Exp |
-    ID              { $$ = ExpAction3(globalSymbolTable,$1);}        |
-    Call            { $$ = ExpAction4($1); }                         |  
-    NUM             { $$ = ExpAction5($1); }                         |
-    NUM B           { $$ = ExpAction6($1,$2); }                      |
-    STRING          { $$ = ExpAction7(); }                           |
-    TRUE            { $$ = ExpAction8(); }                           |
-    FALSE           { $$ = ExpAction9(); }                           |
-	Exp AND Exp     { $$ = ExpAction10($1,$2,$3); }                  |
-    Exp OR Exp      { $$ = ExpAction11($1,$2,$3); }                  |
-    Exp RELOP Exp   { $$ = ExpAction12($1,$2,$3); }                  |
-    NOT Exp         { $$ = ExpAction13($1,$2); } 
+    LPAREN Exp RPAREN   { CallToEnterScope(globalSymbolTable);
+                          $$ = ExpAction1($1,$2,$3);
+                          CallToExitScope(globalSymbolTable);}           |
+    Exp BINOP Exp       { $$ = ExpAction2($1,$2,$3);}                    |
+    ID                  { $$ = ExpAction3(globalSymbolTable,$1);}        |
+    Call                { $$ = ExpAction4($1); }                         |  
+    NUM                 { $$ = ExpAction5($1); }                         |
+    NUM B               { $$ = ExpAction6($1,$2); }                      |
+    STRING              { $$ = ExpAction7(); }                           |
+    TRUE                { $$ = ExpAction8(); }                           |
+    FALSE               { $$ = ExpAction9(); }                           |
+	Exp AND Exp         { $$ = ExpAction10($1,$2,$3); }                  |
+    Exp OR Exp          { $$ = ExpAction11($1,$2,$3); }                  |
+    Exp RELOP Exp       { $$ = ExpAction12($1,$2,$3); }                  |
+    NOT Exp             { $$ = ExpAction13($1,$2); } 
 
     
 ;

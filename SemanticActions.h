@@ -58,7 +58,7 @@ Node* ExpAction1(Node* node1 , Node* node2 , Node* node3);
 // Exp -> Exp BINOP Exp
 Node* ExpAction2(Node* node1 , Node* node2 , Node* node3);
 // Exp -> ID
-Node* ExpAction3(SymbolTable& symTable , Node* arg );
+Node* ExpAction3(SymbolTable& symTable , Node* node1 );
 // Exp -> Call
 Node* ExpAction4(Node* node);
 // Exp -> NUM

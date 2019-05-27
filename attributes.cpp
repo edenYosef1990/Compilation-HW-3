@@ -10,25 +10,15 @@ bool IsItConstOrExistingSymbol(DataObj * dataObject){
     return false;
 }
 
-Node* symbolNameToExp(TypeNameEnum type , std::string){
+Node* TypeNameToExp(TypeNameEnum type){
         switch(type){
             case TYPE_FUNC: return new NonTermFunc() ; break; // A Function cant be an ID in expression , so it must be an error!
             case TYPE_INT: return new NonTermInt(); break;
             case TYPE_BYTE: return new NonTermByte(); break;
             case TYPE_BOOL: return new NonTermBool(); break;
             case TYPE_STR: return new NonTermStr(); break;
-            case TYPE_NONEXIST: return new IDNotExists(); break;  // An ID in epxression cant be undeclared , so it must be an error!
         }
     return nullptr;  
-}
-Node* CallToExp(TypeNameEnum type){
-    switch(type){
-            case TYPE_INT: return new NonTermInt(); break;
-            case TYPE_BYTE: return new NonTermByte(); break;
-            case TYPE_BOOL: return new NonTermBool(); break;
-            case TYPE_STR: return new NonTermStr(); break;
-            }
-    return nullptr;
 }
 
 TypeNameEnum TypeNameToTypeEnum(Node * node){
@@ -36,7 +26,7 @@ TypeNameEnum TypeNameToTypeEnum(Node * node){
     return typeName->name;
 }
 
-TypeNameEnum ExpToFuncPara(Node * node){
+TypeNameEnum ExpToTypeName(Node * node){
     if(dynamic_cast<NonTermBool*>(node)!= nullptr){
         return TYPE_BOOL;
     }

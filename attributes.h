@@ -207,11 +207,9 @@ class PreCondListObj : public Node {
 
 bool IsItConstOrExistingSymbol(DataObj * dataObject);
 
-Node* symbolNameToExp(TypeNameEnum type , std::string);
+Node* TypeNameToExp(TypeNameEnum type);
 
-Node* CallToExp(TypeNameEnum type);
-
-TypeNameEnum ExpToFuncPara(Node * node);
+TypeNameEnum ExpToTypeName(Node * node);
 
 std::vector<string> ParaListToStrings(std::list<TypeNameEnum> paraList1);
 
