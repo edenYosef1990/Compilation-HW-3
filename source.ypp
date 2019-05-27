@@ -59,7 +59,7 @@ Funcs :
 ;
 FuncDecl :
     RetType ID {CallToEnterScope(globalSymbolTable);} LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE
-     {CallToPreConditions($1,$2,$3,$4,$5,$6,$7);} {CallToExitScope(globalSymbolTable,$5);}
+     {CallToExitScopeWithPreConds(globalSymbolTable,$1,$2,$3,$4,$5,$6,$7);}
 ;
 
 

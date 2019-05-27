@@ -363,10 +363,14 @@ void ExitWhile(int &in_while_flag) {
 
 // Assoiated with : FuncDecl -> RetType ID <MARKER> LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE
 
-void CallToPreConditions(Node* node1 , Node* node2 , Node* node3 , Node* node4 , Node* node5 , Node* node6 , Node* node7){
+void CallToExitScopeWithPreConds(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3 ,
+        Node* node4 , Node* node5 , Node* node6 , Node* node7){
+    output::endScope();
     std::string name = (dynamic_cast<IdVal*>(node2))->GetVal();
     int num = (node7 != nullptr) ? (dynamic_cast<PreCondListObj*>(node7))->GetNumCond() : 0;
     output::printPreconditions(name,num);
+    CallToPrintIDsInScope(symTable,node5);
+    symTable.ExitScope();
 }
 
 void CallToPrintIDsInScope(SymbolTable& symTable , Node * paraList){
