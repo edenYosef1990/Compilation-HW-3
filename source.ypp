@@ -47,6 +47,7 @@
 %token ID
 %token NUM
 %token STRING
+%token COMMENT
 
 
 %%
@@ -55,7 +56,7 @@ Program  :
     Funcs
 ;
 Funcs : 
-    /*epsilon*/ | FuncDecl Funcs
+    /*epsilon*/ | FuncDecl Funcs | COMMENT Funcs
 ;
 FuncDecl :
     RetType ID {CallToEnterScope(globalSymbolTable);} LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE
@@ -85,14 +86,14 @@ PreCondition :
 	PRECOND LPAREN Exp RPAREN { PreConditionAction1($1,$2,$3,$4);}
 ;
 Statements : 
-    Statement | Statements Statement // dont need to do anything right now
+    Statement | Statements Statement | Statements COMMENT // dont need to do anything right now
 ;
 Statement : 
     LBRACE {CallToEnterScope(globalSymbolTable);} Statements {CallToExitScope(globalSymbolTable);} RBRACE        | 
     Type ID SC               {StatmentAction1(globalSymbolTable,$1,$2,$3);}                                      | 
     Type ID ASSIGN Exp SC    {StatmentAction2(globalSymbolTable ,$1,$2,$3,$4,$5);}                               | 
     ID ASSIGN Exp SC         {StatmentAction3(globalSymbolTable,$1,$2,$3,$4);}                                   | 
-    IF_SUFFIX %prec "then"                                                                                       |
+    IF_SUFFIX  %prec "then"                                                                                      |
     IF_SUFFIX ELSE {CallToEnterScope(globalSymbolTable);} Statement {CallToExitScope(globalSymbolTable);}        |
     WHILE LPAREN {CallToEnterScope(globalSymbolTable); EnterWhile(in_while_flag);} Exp RPAREN Statement
              {CallToExitScope(globalSymbolTable);ExitWhile(in_while_flag);}                                      |
@@ -145,8 +146,9 @@ int main()
 {
     globalSymbolTable = SymbolTable();
     in_while_flag = 0;
-	if(yyparse() != 0){
-        output::errorSyn(yylineno);
+	if(yyparse() != 0);
+    if(!(globalSymbolTable.IsMainExists())){
+        output::errorMainMissing();
     }
     //if(!main_flag)
     //    errorMainMissing();

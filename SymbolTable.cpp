@@ -1,6 +1,6 @@
 #include "SymbolTable.h"
 
-SymbolTable::SymbolTable() : ScopesList(), CurrentScopeLevel(0) ,CurrentIndexInScope(0) {
+SymbolTable::SymbolTable() : isThereMain(false), ScopesList(), CurrentScopeLevel(0) ,CurrentIndexInScope(0) {
     ScopesList.push_back(std::list<Symbol*>());
     std::list<TypeNameEnum> typesList1 = std::list<TypeNameEnum>();
     typesList1.push_back(TYPE_STR);
@@ -36,6 +36,14 @@ void SymbolTable::AddVariableSymbol(std::string name , int index , TypeNameEnum 
 
 void SymbolTable::AddFuncSymbol(std::string name , int index , TypeNameEnum type , std::list<TypeNameEnum> parametersList , TypeNameEnum retType){
     ScopesList.back().push_back(new FunctionSymbol(name,index,type,parametersList,retType));  // sould be changed for Functions!
+}
+
+void SymbolTable::FoundMainFunc(){
+    isThereMain=true;
+}
+
+bool SymbolTable::IsMainExists(){
+    return isThereMain;
 }
 
 Symbol* SymbolTable::GetSymbol(std::string name){

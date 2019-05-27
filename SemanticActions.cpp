@@ -50,7 +50,8 @@ Node * FormalDeclAction1(SymbolTable& symTable , Node * node1 , Node * node2){
     Symbol* sym = symTable.GetSymbol(name);
     if(sym != nullptr){
         output::errorDef(yylineno,name); // already exists!
-        yyerror("error!");
+        exit(0);
+      //  yyerror("error!");
     }
     symTable.AddVariableSymbol(name , symTable.getCurrentIndex()+1 ,type);
     return new ParaListObj(type);
@@ -73,7 +74,8 @@ void PreConditionAction1(Node* node1 , Node* node2 , Node* node3 , Node* node4) 
     TypeNameEnum type = ExpToTypeName(node3);
     if(type!=TYPE_BOOL){
         output::errorMismatch(yylineno);
-        yyerror("");
+        exit(0);
+        //yyerror("");
     }
 }
 //Statment -> Type ID SC
@@ -83,7 +85,8 @@ void StatmentAction1(SymbolTable& symTable , Node* node1 , Node* node2, Node* no
     Symbol* sym = symTable.GetSymbol(name);
     if(sym != nullptr){
         output::errorDef(yylineno,(dynamic_cast<IdVal*>(node2))->IdStr); // already exists in the symbol table
-        yyerror("");
+        exit(0);
+        //yyerror("");
     }
     TypeNameEnum type = TypeNameToTypeEnum(node1);
     symTable.AddVariableSymbol(name , symTable.getCurrentIndex()+1 ,type);
@@ -94,13 +97,16 @@ void StatmentAction1(SymbolTable& symTable , Node* node1 , Node* node2, Node* no
 void StatmentAction2(SymbolTable& symTable , Node* node1 , Node* node2, Node* node3, Node* node4, Node* node5){
     std::string name = (dynamic_cast<IdVal*>(node2))->IdStr;
     Symbol* sym = symTable.GetSymbol(name);
+    
     if(sym != nullptr){
         output::errorDef(yylineno,(dynamic_cast<IdVal*>(node2))->IdStr); // alrady exists in the symbol table
-        yyerror("");
+        exit(0);
+        //yyerror("");
     }
     if(dynamic_cast<Type*>(node1)->name != dynamic_cast<DataObj*>(node4)->type){ // mismatch
         output::errorMismatch(yylineno);
-        yyerror("");
+        exit(0);
+        //yyerror("");
     }
     TypeNameEnum type = TypeNameToTypeEnum(node1);
     symTable.AddVariableSymbol(name , symTable.getCurrentIndex()+1 ,type);
@@ -112,30 +118,34 @@ void StatmentAction3(SymbolTable& symTable , Node* node1 , Node* node2, Node* no
     Symbol* sym = symTable.GetSymbol(name);
     if(sym == nullptr){
         output::errorUndef(yylineno, (dynamic_cast<IdVal*>(node1))->IdStr); // not exists in the symbol table
-        yyerror("error!");
+        exit(0);
+        //yyerror("error!");
     }
     TypeNameEnum type = sym->GetType();
     if(type != dynamic_cast<DataObj*>(node3)->type){ // mismatch
         output::errorMismatch(yylineno);
-        yyerror("error!");
+        exit(0);
+        //yyerror("error!");
     }
 }
 
 //Statment -> BREAK SC 
 
-void StatmentAction4(int in_while_flag)
-{if(in_while_flag<=0){
+void StatmentAction4(int in_while_flag){
+    if(in_while_flag<=0){
      output::errorUnexpectedBreak(yylineno);
-     yyerror("error!");
+     exit(0);
+     //yyerror("error!");
     }
 }
 
 //Statment -> CONTINUE SC
 
-void StatmentAction5(int in_while_flag)
-{if(in_while_flag<=0){
+void StatmentAction5(int in_while_flag){
+    if(in_while_flag<=0){
      output::errorUnexpectedBreak(yylineno);
-     yyerror("error!");
+     exit(0);
+     //yyerror("error!");
     }
 }
 
@@ -154,12 +164,35 @@ Node* ExpListAction2(Node* node1){
     return new ParaListObj(ExpToTypeName(node1));
 }
 
+bool AreParaListsEqual(std::list<TypeNameEnum> list1 , std::list<TypeNameEnum> list2){
+    if(list1.size() != list2.size()){
+        return false;
+    }
+    std::list<TypeNameEnum>::iterator it1 = list1.begin();
+    std::list<TypeNameEnum>::iterator it2 = list2.begin();
+    while(it1!=list1.begin()){
+        if((*it1)!=(*it2)){
+            if((*it1)==TYPE_BYTE && (*it2)==TYPE_INT){
+                continue;
+            }
+            else{
+                return false;
+            }
+        }
+        it1++;
+        it2++;
+    }
+    return true;
+
+}
+
 // Call -> ID LPAREN ExpList RPAREN
 
 Node* CallAction1(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3 , Node* node4){
     Symbol * sym = symTable.GetSymbol((dynamic_cast<IdVal*>(node1))->IdStr);
     if(sym == nullptr || sym->GetType() != TYPE_FUNC ){
         output::errorUndefFunc(yylineno,(dynamic_cast<IdVal*>(node1))->IdStr);
+        exit(0);
         yyerror("error!");
     }
     std::list<TypeNameEnum> symParas = (dynamic_cast<FunctionSymbol*>(sym))->GetParametersList();
@@ -177,9 +210,10 @@ Node* CallAction1(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node
         std::cout << std::endl << "type : " << (*it) << std::endl;
     }
     std::cout << "end" << std::endl;*/
-    if(symParas != expListparas){
+    if(!AreParaListsEqual(expListparas,symParas)){
         output::errorPrototypeMismatch(yylineno,(dynamic_cast<IdVal*>(node1))->IdStr,vector_symParas);
-        yyerror("error!");
+        exit(0);
+        //yyerror("error!");
     }
     FunctionSymbol* funcSym = dynamic_cast<FunctionSymbol*>(sym);
     return TypeNameToExp(funcSym->GetRetType());
@@ -191,14 +225,16 @@ Node* CallAction2(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node
     Symbol * sym = symTable.GetSymbol((dynamic_cast<IdVal*>(node1))->IdStr);
     if(sym == nullptr || sym->GetType() != TYPE_FUNC ){
         output::errorUndefFunc(yylineno,(dynamic_cast<IdVal*>(node1))->IdStr);
-        yyerror("error!");
+        exit(0);
+        //yyerror("error!");
     }
     std::list<TypeNameEnum> symParas = (dynamic_cast<FunctionSymbol*>(sym))->GetParametersList(); 
     std::list<TypeNameEnum> expListparas = std::list<TypeNameEnum>();
     if(symParas != expListparas){
         std::vector<string> vector_symParas = ParaListToStrings(symParas);
         output::errorPrototypeMismatch(yylineno,(dynamic_cast<IdVal*>(node1))->IdStr,vector_symParas);
-        yyerror("error!");
+        exit(0);
+        //yyerror("error!");
     }
     return TypeNameToExp(sym->GetType());
 }
@@ -226,7 +262,9 @@ Node* TypeAction3(){
 Node* ExpAction1(Node* node1 , Node* node2 , Node* node3) {
     TypeNameEnum type = ExpToTypeName(node2);
     if(type != TYPE_BOOL){
-            yyerror("error!");
+            output::errorMismatch(yylineno);
+            exit(0);
+            //yyerror("error!");
         }
     return TypeNameToExp(TYPE_BOOL);
 }// TODO: add error here
@@ -238,7 +276,9 @@ Node* ExpAction2(Node* node1 , Node* node2 , Node* node3){
     TypeNameEnum node2Type = ExpToTypeName(node3);
     if((node1Type != TYPE_INT && node1Type != TYPE_BYTE)
         | (node2Type != TYPE_INT && node2Type != TYPE_BYTE) ){
-            yyerror("error!");
+            output::errorMismatch(yylineno);
+            exit(0);
+            //yyerror("error!");
         }
     if(node1Type==TYPE_INT | node2Type==TYPE_INT ){
         return TypeNameToExp(TYPE_INT);
@@ -256,11 +296,13 @@ Node* ExpAction3(SymbolTable& symTable , Node* node1){
     if(sym == nullptr){
         std::cout << std::endl << "error1!" << std::endl;
         output::errorUndef(yylineno,name);
-        yyerror("no such variable!");
+        exit(0);
+        //yyerror("no such variable!");
     }
     else if(sym->GetType() == TYPE_FUNC){
         output::errorUndef(yylineno,name);
-        yyerror("this is the name of a function!");
+        exit(0);
+        //yyerror("this is the name of a function!");
     }
     return TypeNameToExp(sym->GetType());
 }
@@ -280,9 +322,11 @@ Node* ExpAction5(Node* node){
 // Exp -> NUM B
 
 Node* ExpAction6(Node* node1 , Node* node2){
-    if( !IsItConstOrExistingSymbol(dynamic_cast<DataObj*>(node1)) && NonTermByte::IsValidByte(node2) )
+    if( !(NonTermByte::IsValidByte(node1)) )
         {
-            yyerror("error!");
+            std::string name = (dynamic_cast<IdVal*>(node1))->GetVal();
+            output::errorByteTooLarge(yylineno,name);
+            exit(0);
         }
     return new NonTermByte();
 } // TODO: add error here
@@ -310,7 +354,9 @@ Node* ExpAction9(){
 Node* ExpAction10(Node* node1 , Node* node2 , Node* node3){
     if(!(NonTermBool::IsValidBoolExp(node1,node2,node3)))
         {
-             yyerror("error!");
+            output::errorMismatch(yylineno);
+            exit(0);
+             //yyerror("error!");
         }
     return new NonTermBool();
 }
@@ -320,7 +366,9 @@ Node* ExpAction10(Node* node1 , Node* node2 , Node* node3){
 Node* ExpAction11(Node* node1 , Node* node2 , Node* node3){
     if(!(NonTermBool::IsValidBoolExp(node1,node2,node3)))
         {
-             yyerror("error!");
+            output::errorMismatch(yylineno);
+            exit(0);
+             //yyerror("error!");
         }
     return new NonTermBool();
 }
@@ -331,7 +379,9 @@ Node* ExpAction12(Node* node1 , Node* node2 , Node* node3){
     if(!(NonTermBool::IsValidBoolExpRelExp(node1,node2,node3)))
         {
             output::errorMismatch(yylineno);
-             yyerror("error!");
+            exit(0);
+            //output::errorMismatch(yylineno);
+             //yyerror("error!");
         }
     return new NonTermBool();
 }
@@ -341,7 +391,9 @@ Node* ExpAction12(Node* node1 , Node* node2 , Node* node3){
 Node* ExpAction13(Node* node1 , Node* node2){
     if(!(NonTermBool::IsValidBoolExp(node2)))
         {
-             yyerror("error!");
+            output::errorMismatch(yylineno);
+            exit(0);
+             //yyerror("error!");
         }
     return new NonTermBool();
 }
@@ -380,12 +432,18 @@ void CallToExitScopeWithPreConds(SymbolTable& symTable , Node* node1 , Node* nod
     output::endScope();
     std::string name = (dynamic_cast<IdVal*>(node2))->GetVal();
     TypeNameEnum type = (dynamic_cast<Type*>(node1))->name;
-
+    Symbol * sym = symTable.GetSymbol(name);
+    if(sym!=nullptr){
+        output::errorDef(yylineno,name);
+    }
     int num = (node7 != nullptr) ? (dynamic_cast<PreCondListObj*>(node7))->GetNumCond() : 0;
     output::printPreconditions(name,num);
     CallToPrintIDsInScope(symTable,node5);
     std::list<TypeNameEnum> typesList = (dynamic_cast<ParaListObj*>(node5))->GetParaList();
     symTable.ExitScope();
+    if(name=="main" && num==0 && typesList.size()==0 && type==TYPE_VOID){
+        symTable.FoundMainFunc();
+    }
     symTable.AddFuncSymbol(name,0,TYPE_FUNC,typesList,type);
 }
 

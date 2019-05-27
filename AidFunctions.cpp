@@ -4,10 +4,12 @@
 #include <cmath>
 
 int CharPointerToInt(char * str){
-    int i=1;
+    int i=0;
     int val=0;
     while(str[i] != '\0'){
-        val += (int)(str[i]-'0')*pow(10,i);
+        val *=10;
+        val += (int)(str[i]-'0');
+        i++;
     }
     return val;
 }

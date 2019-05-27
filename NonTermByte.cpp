@@ -8,6 +8,6 @@ NonTermByte::NonTermByte(std::string name) : DataObj(name) {this->type = TYPE_BY
 
 bool NonTermByte::IsValidByte(Node * node){
     
-    int number = (dynamic_cast<NonTermInt*>(node))->GetNumericValue();
+    int number = (dynamic_cast<NumVal*>(node))->getVal();
     return (number >=0 && number <=255) ? true : false;
 }
