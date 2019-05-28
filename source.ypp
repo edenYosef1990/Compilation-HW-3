@@ -59,9 +59,20 @@ Funcs :
     /*epsilon*/ | FuncDecl Funcs | COMMENT Funcs
 ;
 FuncDecl :
-    RetType ID {globalSymbolTable.SetCurrentRetType($1);CallToEnterScope(globalSymbolTable);}
-     LPAREN Formals RPAREN {checkMainRetValueAndParam($1, $2, $5); } PreConditions LBRACE Statements RBRACE
-     {CallToExitScopeWithPreConds(globalSymbolTable,$1,$2,$3,$4,$5,$6,$8);}
+    RetType ID  {   
+                    globalSymbolTable.SetCurrentRetType($1);
+                    CallToEnterScope(globalSymbolTable);
+                }
+    LPAREN
+        Formals 
+    RPAREN 
+                { checkMainRetValueAndParam($1, $2, $5);} 
+        PreConditions 
+                { addFunction(globalSymbolTable,$1,$2,$3,$4,$5,$6,$8);}
+      LBRACE
+        Statements 
+      RBRACE 
+                {CallToExitScopeWithPreConds(globalSymbolTable,$1,$2,$3,$4,$5,$6,$8);}
 ;
 
 
@@ -96,7 +107,7 @@ Statement :
     ID ASSIGN Exp SC         {StatmentAction3(globalSymbolTable,$1,$2,$3,$4);}                                   | 
     IF_SUFFIX  %prec "then"                                                                                      |
     IF_SUFFIX ELSE {CallToEnterScope(globalSymbolTable);} Statement {CallToExitScope(globalSymbolTable);}        |
-    WHILE LPAREN {CallToEnterScope(globalSymbolTable); EnterWhile(in_while_flag);} Exp RPAREN Statement
+    WHILE LPAREN {CallToEnterScope(globalSymbolTable); EnterWhile(in_while_flag);} Exp {checkIfBoolInWhileIf($4);} RPAREN Statement
              {CallToExitScope(globalSymbolTable);ExitWhile(in_while_flag);}                                      |
     BREAK SC                 {StatmentAction4(in_while_flag);}                                                   |
     CONTINUE SC              {StatmentAction5(in_while_flag);}                                                   |
@@ -105,7 +116,7 @@ Statement :
     Call SC
 ;
 
-IF_SUFFIX : IF LPAREN {CallToEnterScope(globalSymbolTable);} Exp RPAREN Statement {CallToExitScope(globalSymbolTable);} // solves a reduce-reduce conflict!
+IF_SUFFIX : IF LPAREN {CallToEnterScope(globalSymbolTable);} Exp {checkIfBoolInWhileIf($4);} RPAREN Statement {CallToExitScope(globalSymbolTable);} // solves a reduce-reduce conflict!
 ;
 
 Call : 

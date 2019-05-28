@@ -177,13 +177,13 @@ class ParaListObj : public Node {
     public:
         ParaListObj() {}
         ParaListObj(TypeNameEnum newPara) {
-            paraList.push_back(newPara);
+            paraList.push_front(newPara);
         }
         ParaListObj(ParaListObj * oldList , TypeNameEnum newPara) : paraList(oldList->paraList) {
-            paraList.push_back(newPara);
+            paraList.push_front(newPara);
         }
         ParaListObj(ParaListObj * oldList , ParaListObj * anotherListOfOneObj) : paraList(oldList->paraList) {
-            paraList.push_back(anotherListOfOneObj->GetParaList().back());
+            paraList.push_front(anotherListOfOneObj->GetParaList().back());
         }
         std::list<TypeNameEnum> GetParaList() {return paraList;}
         int GetParaListSize() {return paraList.size();}

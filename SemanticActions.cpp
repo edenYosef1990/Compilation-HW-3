@@ -154,6 +154,7 @@ void StatmentAction5(int in_while_flag){
 //Statment -> RETURN SC
 
 void StatmentAction6(SymbolTable& symTable){
+
     if(!(symTable.GetCurrentRetType()==TYPE_VOID)){
         output::errorMismatch(yylineno);
         exit(0);
@@ -164,7 +165,8 @@ void StatmentAction6(SymbolTable& symTable){
 
 void StatmentAction7(SymbolTable& symTable , Node * node1 , Node * node2){
     TypeNameEnum type = ExpToTypeName(node2);
-    if(!(symTable.GetCurrentRetType()==type)){
+
+    if(!(symTable.GetCurrentRetType()==type) && !(symTable.GetCurrentRetType()==TYPE_INT && type == TYPE_BYTE)){
         output::errorMismatch(yylineno);
         exit(0);
     }
@@ -191,9 +193,11 @@ bool AreParaListsEqual(std::list<TypeNameEnum> list1 , std::list<TypeNameEnum> l
     }
     std::list<TypeNameEnum>::iterator it1 = list1.begin();
     std::list<TypeNameEnum>::iterator it2 = list2.begin();
-    while(it1!=list1.begin()){
+    while(it1!=list1.end()){
         if((*it1)!=(*it2)){
             if((*it1)==TYPE_BYTE && (*it2)==TYPE_INT){
+                it1++;
+                it2++;
                 continue;
             }
             else{
@@ -214,7 +218,6 @@ Node* CallAction1(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node
     if(sym == nullptr || sym->GetType() != TYPE_FUNC ){
         output::errorUndefFunc(yylineno,(dynamic_cast<IdVal*>(node1))->IdStr);
         exit(0);
-        yyerror("error!");
     }
     std::list<TypeNameEnum> symParas = (dynamic_cast<FunctionSymbol*>(sym))->GetParametersList();
     std::list<TypeNameEnum> expListparas = (dynamic_cast<ParaListObj*>(node3))->GetParaList();
@@ -314,7 +317,6 @@ Node* ExpAction3(SymbolTable& symTable , Node* node1){
     std::string name = (dynamic_cast<IdVal*>(node1))->GetVal();
     Symbol* sym = symTable.GetSymbol(name);
     if(sym == nullptr){
-        std::cout << std::endl << "error1!" << std::endl;
         output::errorUndef(yylineno,name);
         exit(0);
         //yyerror("no such variable!");
@@ -400,8 +402,6 @@ Node* ExpAction12(Node* node1 , Node* node2 , Node* node3){
         {
             output::errorMismatch(yylineno);
             exit(0);
-            //output::errorMismatch(yylineno);
-             //yyerror("error!");
         }
     return new NonTermBool();
 }
@@ -445,7 +445,7 @@ void ExitWhile(int &in_while_flag) {
     in_while_flag--;
 }
 
-// Assoiated with : FuncDecl -> RetType ID <MARKER> LPAREN Formals RPAREN PreConditions LBRACE Statements RBRACE
+// Assoiated with : FuncDecl -> RetType ID <MARKER> LPAREN Formals RPAREN PreConditions <MARKER> LBRACE Statements RBRACE
 
 void checkMainRetValueAndParam(Node* node1, Node* node2, Node* node3){
     std::string name = (dynamic_cast<IdVal*>(node2))->GetVal();
@@ -464,24 +464,46 @@ void CallToExitScopeWithPreConds(SymbolTable& symTable , Node* node1 , Node* nod
     output::endScope();
     std::string name = (dynamic_cast<IdVal*>(node2))->GetVal();
     TypeNameEnum type = (dynamic_cast<Type*>(node1))->name;
-    Symbol * sym = symTable.GetSymbol(name);
-    if(sym!=nullptr){
-        output::errorDef(yylineno,name);
-    }
     int num = (node7 != nullptr) ? (dynamic_cast<PreCondListObj*>(node7))->GetNumCond() : 0;
     output::printPreconditions(name,num);
-    CallToPrintIDsInScope(symTable,node5);
-    std::list<TypeNameEnum> typesList = (dynamic_cast<ParaListObj*>(node5))->GetParaList();
+    CallToPrintIDsInScope(symTable,node7);
     symTable.ExitScope();
+}
+
+
+void checkPreCondMain(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3 ,
+        Node* node4 , Node* node5 , Node* node6 , Node* node7){
+    std::string name = (dynamic_cast<IdVal*>(node2))->GetVal();
+    TypeNameEnum type = (dynamic_cast<Type*>(node1))->name;
+    int num = (node7 != nullptr) ? (dynamic_cast<PreCondListObj*>(node7))->GetNumCond() : 0;
+    std::list<TypeNameEnum> typesList = (dynamic_cast<ParaListObj*>(node5))->GetParaList();
     if(name=="main" && num==0 && typesList.size()==0 && type==TYPE_VOID){
         symTable.FoundMainFunc();
     }
+}
+
+void addFunction(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3 ,
+        Node* node4 , Node* node5 , Node* node6 , Node* node7){
+    std::string name = (dynamic_cast<IdVal*>(node2))->GetVal();
+    TypeNameEnum type = (dynamic_cast<Type*>(node1))->name;
+    Symbol * sym = symTable.GetSymbol(name);
+    if(sym!=nullptr){
+        output::errorDef(yylineno,name);
+        exit(0);
+    }
+    int num = (node7 != nullptr) ? (dynamic_cast<PreCondListObj*>(node7))->GetNumCond() : 0;
+    std::list<TypeNameEnum> typesList = (dynamic_cast<ParaListObj*>(node5))->GetParaList();
+    //typesList.reverse();
+    if(name=="main" && num==0 && typesList.size()==0 && type==TYPE_VOID){
+        symTable.FoundMainFunc();
+    }
+
     symTable.AddFuncSymbol(name,0,TYPE_FUNC,typesList,type);
 }
 
 void CallToPrintIDsInScope(SymbolTable& symTable , Node * paraList){
     ParaListObj* list = dynamic_cast<ParaListObj*>(paraList);
-    int numParas = list->GetParaListSize();
+    int numParas = list != nullptr ? list->GetParaListSize() : 0;
     std::list<Symbol*> IDList = symTable.GetCurrentScope();
     int i=0;
     int j=0;
@@ -513,3 +535,10 @@ void CallToPrintIDsInScope(SymbolTable& symTable){
         }
 }
 
+void checkIfBoolInWhileIf(Node* node){
+    TypeNameEnum type = ExpToTypeName(node);
+    if(type != TYPE_BOOL){
+        output::errorMismatch(yylineno);
+        exit(0);
+    }
+}

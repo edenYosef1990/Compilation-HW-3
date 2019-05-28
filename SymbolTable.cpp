@@ -43,7 +43,8 @@ void SymbolTable::AddVariableSymbol(std::string name , int index , TypeNameEnum 
 }
 
 void SymbolTable::AddFuncSymbol(std::string name , int index , TypeNameEnum type , std::list<TypeNameEnum> parametersList , TypeNameEnum retType){
-    ScopesList.back().push_back(new FunctionSymbol(name,index,type,parametersList,retType));  // sould be changed for Functions!
+
+    ScopesList.front().push_back(new FunctionSymbol(name,index,type,parametersList,retType));  // sould be changed for Functions!
 }
 
 void SymbolTable::FoundMainFunc(){

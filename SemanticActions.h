@@ -96,10 +96,15 @@ void ExitWhile(int &in_while_flag);
 void CallToExitScopeWithPreConds(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3 ,
         Node* node4 , Node* node5 , Node* node6 , Node* node7);
 
+void addFunction(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3 ,
+        Node* node4 , Node* node5 , Node* node6 , Node* node7);
+
 void CallToPrintIDsInScope(SymbolTable& symTable , Node * paraList);
 
 void CallToPrintIDsInScope(SymbolTable& symTable);
 
 void checkMainRetValueAndParam(Node* node1, Node* node2, Node* node3);
+
+void checkIfBoolInWhileIf(Node* node);
 
 #endif
