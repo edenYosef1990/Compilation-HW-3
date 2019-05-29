@@ -17,7 +17,7 @@ class Symbol {
         Symbol(std::string _symbolName , int _symbolIndex , TypeNameEnum type) : SymbolName(_symbolName) , SymbolIndex(_symbolIndex) , Type(type) {
             
         }
-        Symbol(const Symbol& Sym) = default;
+          Symbol(const Symbol& Sym) = default;
         std::string GetName() {return SymbolName;}
         int GetIndex() {return SymbolIndex;}
         TypeNameEnum GetType() {return Type;}
@@ -33,12 +33,15 @@ class VariableSymbol : public Symbol {
 class FunctionSymbol : public Symbol {
     std::list<TypeNameEnum> ParametersList;
     TypeNameEnum RetType;
+    int PrecondNum;
     public:
-        FunctionSymbol(std::string _symbolName , int _symbolIndex , TypeNameEnum type , std::list<TypeNameEnum> parametersList , TypeNameEnum retType) : 
-            Symbol(_symbolName,_symbolIndex,type) , ParametersList(parametersList) , RetType(retType) {}
+        FunctionSymbol(std::string _symbolName , int _symbolIndex , TypeNameEnum type ,
+         std::list<TypeNameEnum> parametersList , TypeNameEnum retType , int precondNum) : 
+            Symbol(_symbolName,_symbolIndex,type) , ParametersList(parametersList) , RetType(retType) , PrecondNum(precondNum) {}
         FunctionSymbol(const FunctionSymbol& varSym) = default;
         std::list<TypeNameEnum> GetParametersList() {return ParametersList;}
         TypeNameEnum GetRetType() {return RetType;}
+        int GetPreCondNum() { return PrecondNum;}
 };
 
 class SymbolTable {
@@ -54,7 +57,7 @@ class SymbolTable {
         int getCurrentIndex();
         void AddSymbol(std::string name , int index , TypeNameEnum type);
         void AddVariableSymbol(std::string name , int index , TypeNameEnum type);
-        void AddFuncSymbol(std::string name , int index , TypeNameEnum type , std::list<TypeNameEnum> parametersList , TypeNameEnum retType);
+        void AddFuncSymbol(std::string name , int index , TypeNameEnum type , std::list<TypeNameEnum> parametersList , TypeNameEnum retType , int precondNum);
         //TypeNameEnum GetTypeOfSymbol(std::string name);
         void FoundMainFunc();
         bool IsMainExists();
@@ -63,6 +66,8 @@ class SymbolTable {
         Symbol* GetSymbol(std::string name);
         std::list<Symbol*> GetCurrentScope();
         void printTable();
+        FunctionSymbol* GetCurrentFunction();
+        int GetNCurrIndexInMem();
 };
 
 #endif

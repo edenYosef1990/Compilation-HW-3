@@ -1,9 +1,6 @@
 #include "SemanticActions.h"
 #include "output.hpp"
 
-
-
-
 // RetType -> TYPE 
 
 Node * RetTypeAction1(Node * node1){
@@ -145,7 +142,7 @@ void StatmentAction4(int in_while_flag){
 
 void StatmentAction5(int in_while_flag){
     if(in_while_flag<=0){
-     output::errorUnexpectedBreak(yylineno);
+     output::errorUnexpectedContinue(yylineno);
      exit(0);
      //yyerror("error!");
     }
@@ -154,8 +151,9 @@ void StatmentAction5(int in_while_flag){
 //Statment -> RETURN SC
 
 void StatmentAction6(SymbolTable& symTable){
-
-    if(!(symTable.GetCurrentRetType()==TYPE_VOID)){
+    FunctionSymbol* funcSym = symTable.GetCurrentFunction();
+    TypeNameEnum type = funcSym->GetRetType();
+    if(!(type==TYPE_VOID)){
         output::errorMismatch(yylineno);
         exit(0);
     }
@@ -164,9 +162,11 @@ void StatmentAction6(SymbolTable& symTable){
 //Statment -> RETURN Exp SC
 
 void StatmentAction7(SymbolTable& symTable , Node * node1 , Node * node2){
-    TypeNameEnum type = ExpToTypeName(node2);
+    TypeNameEnum currtype = ExpToTypeName(node2);
+    FunctionSymbol* funcSym = symTable.GetCurrentFunction();
+    TypeNameEnum definedType = funcSym->GetRetType();
 
-    if(!(symTable.GetCurrentRetType()==type) && !(symTable.GetCurrentRetType()==TYPE_INT && type == TYPE_BYTE)){
+    if(!(currtype==definedType) && !(definedType==TYPE_INT && currtype == TYPE_BYTE)){
         output::errorMismatch(yylineno);
         exit(0);
     }
@@ -346,8 +346,8 @@ Node* ExpAction5(Node* node){
 Node* ExpAction6(Node* node1 , Node* node2){
     if( !(NonTermByte::IsValidByte(node1)) )
         {
-            std::string name = (dynamic_cast<IdVal*>(node1))->GetVal();
-            output::errorByteTooLarge(yylineno,name);
+            std::string str = (dynamic_cast<NumVal*>(node1))->getStr();
+            output::errorByteTooLarge(yylineno,str);
             exit(0);
         }
     return new NonTermByte();
@@ -420,19 +420,35 @@ Node* ExpAction13(Node* node1 , Node* node2){
 
 //=================================== Handling Home Work's Special Functions ===============================================
 
-void CallToEnterScope(SymbolTable& symTable){
+void CallToEnterGlobalScope(SymbolTable& symTable){
     symTable.EnterScope();
 }
 
-void CallToExitScope(SymbolTable& symTable){
+void CallToExitGlobalScope(SymbolTable& symTable){
     output::endScope();
-    CallToPrintIDsInScope(symTable);
+    printIDsInGlobalScope(symTable);
     symTable.ExitScope();
 }
 
-void CallToExitScope(SymbolTable& symTable , Node* paraList){
+void CallToEnterFunctionScope(SymbolTable& symTable){
+    symTable.EnterScope();
+}
+
+void CallToExitFunctionScope(SymbolTable& symTable){
     output::endScope();
-    CallToPrintIDsInScope(symTable,paraList);
+    FunctionSymbol * funcSym = symTable.GetCurrentFunction();
+    output::printPreconditions(funcSym->GetName(),funcSym->GetPreCondNum());
+    printIDsInFunctionScope(symTable);
+    symTable.ExitScope();
+}
+
+void CallToEnterInnerScope(SymbolTable& symTable){
+    symTable.EnterScope();
+}
+
+void CallToExitInnerScope(SymbolTable& symTable){
+    output::endScope();
+    printIDsInInnerScope(symTable);
     symTable.ExitScope();
 }
 
@@ -445,47 +461,12 @@ void ExitWhile(int &in_while_flag) {
     in_while_flag--;
 }
 
-// Assoiated with : FuncDecl -> RetType ID <MARKER> LPAREN Formals RPAREN PreConditions <MARKER> LBRACE Statements RBRACE
-
-void checkMainRetValueAndParam(Node* node1, Node* node2, Node* node3){
-    std::string name = (dynamic_cast<IdVal*>(node2))->GetVal();
-    TypeNameEnum type = (dynamic_cast<Type*>(node1))->name;
-    std::list<TypeNameEnum> typesList = (dynamic_cast<ParaListObj*>(node3))->GetParaList();
-    if(name == "main"){
-        if (type != TYPE_VOID || typesList.size() != 0){
-            output::errorMainMissing();
-            exit(0);
-        }
-    }
-}
-
-void CallToExitScopeWithPreConds(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3 ,
-        Node* node4 , Node* node5 , Node* node6 , Node* node7){
-    output::endScope();
-    std::string name = (dynamic_cast<IdVal*>(node2))->GetVal();
-    TypeNameEnum type = (dynamic_cast<Type*>(node1))->name;
-    int num = (node7 != nullptr) ? (dynamic_cast<PreCondListObj*>(node7))->GetNumCond() : 0;
-    output::printPreconditions(name,num);
-    CallToPrintIDsInScope(symTable,node7);
-    symTable.ExitScope();
-}
-
-
-void checkPreCondMain(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3 ,
-        Node* node4 , Node* node5 , Node* node6 , Node* node7){
-    std::string name = (dynamic_cast<IdVal*>(node2))->GetVal();
-    TypeNameEnum type = (dynamic_cast<Type*>(node1))->name;
-    int num = (node7 != nullptr) ? (dynamic_cast<PreCondListObj*>(node7))->GetNumCond() : 0;
-    std::list<TypeNameEnum> typesList = (dynamic_cast<ParaListObj*>(node5))->GetParaList();
-    if(name=="main" && num==0 && typesList.size()==0 && type==TYPE_VOID){
-        symTable.FoundMainFunc();
-    }
-}
+// assosiated with : FuncDecl -> RetType ID  <MARKER> LPAREN Formals  RPAREN  PreConditions 
 
 void addFunction(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3 ,
         Node* node4 , Node* node5 , Node* node6 , Node* node7){
+            TypeNameEnum type = (dynamic_cast<Type*>(node1))->name;
     std::string name = (dynamic_cast<IdVal*>(node2))->GetVal();
-    TypeNameEnum type = (dynamic_cast<Type*>(node1))->name;
     Symbol * sym = symTable.GetSymbol(name);
     if(sym!=nullptr){
         output::errorDef(yylineno,name);
@@ -494,16 +475,41 @@ void addFunction(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3
     int num = (node7 != nullptr) ? (dynamic_cast<PreCondListObj*>(node7))->GetNumCond() : 0;
     std::list<TypeNameEnum> typesList = (dynamic_cast<ParaListObj*>(node5))->GetParaList();
     //typesList.reverse();
-    if(name=="main" && num==0 && typesList.size()==0 && type==TYPE_VOID){
-        symTable.FoundMainFunc();
+    if(name=="main"){
+        if(num==0 && typesList.size()==0 && type==TYPE_VOID){
+            symTable.FoundMainFunc();
+        }
+        // else {
+        //     output::errorMainMissing();
+        //     exit(0);
+        // }
     }
+    symTable.AddFuncSymbol(name,0,TYPE_FUNC,typesList,type,num);
+} // check
 
-    symTable.AddFuncSymbol(name,0,TYPE_FUNC,typesList,type);
-}
 
-void CallToPrintIDsInScope(SymbolTable& symTable , Node * paraList){
-    ParaListObj* list = dynamic_cast<ParaListObj*>(paraList);
-    int numParas = list != nullptr ? list->GetParaListSize() : 0;
+void checkIfBoolInWhileIf(Node* node){
+    TypeNameEnum type = ExpToTypeName(node);
+    if(type != TYPE_BOOL){
+        output::errorMismatch(yylineno);
+        exit(0);
+    }
+} // check
+
+void printIDsInGlobalScope(SymbolTable& symTable){
+    std::list<Symbol*> funcList = symTable.GetCurrentScope();
+    for(std::list<Symbol*>::iterator it = funcList.begin(); it != funcList.end() ; it++){
+        FunctionSymbol* funcSym = dynamic_cast<FunctionSymbol*>(*it);
+        const string retTypeStr = TypeToString(funcSym->GetRetType());
+        std::vector<std::string> typesVec = ParaListToStrings(funcSym->GetParametersList());
+        output::printID(funcSym->GetName(),0,output::makeFunctionType(retTypeStr,typesVec));
+        
+    }
+} // check
+
+void printIDsInFunctionScope(SymbolTable& symTable){
+    FunctionSymbol* funcSym = symTable.GetCurrentFunction();
+    int numParas = funcSym->GetParametersList().size();
     std::list<Symbol*> IDList = symTable.GetCurrentScope();
     int i=0;
     int j=0;
@@ -525,20 +531,23 @@ void CallToPrintIDsInScope(SymbolTable& symTable , Node * paraList){
             }
         }
 
-}
+} // check
 
-void CallToPrintIDsInScope(SymbolTable& symTable){
+
+void printIDsInInnerScope(SymbolTable& symTable){
     std::list<Symbol*> IDList = symTable.GetCurrentScope();
+    FunctionSymbol* funcSym = symTable.GetCurrentFunction();
     for(std::list<Symbol*>::iterator it_scope = IDList.begin() ; 
         it_scope != IDList.end() ; it_scope++){
-            output::printID((*it_scope)->GetName(),(*it_scope)->GetIndex(),TypeToString((*it_scope)->GetType()));
+            int memLoc = (*it_scope)->GetIndex();
+            memLoc -= funcSym->GetParametersList().size();
+            output::printID((*it_scope)->GetName(),memLoc,TypeToString((*it_scope)->GetType()));
         }
-}
+} // check
 
-void checkIfBoolInWhileIf(Node* node){
-    TypeNameEnum type = ExpToTypeName(node);
-    if(type != TYPE_BOOL){
-        output::errorMismatch(yylineno);
+void mainCheck(SymbolTable& symTable){
+    if(!(symTable.IsMainExists())){
+        output::errorMainMissing();
         exit(0);
     }
 }

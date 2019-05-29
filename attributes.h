@@ -76,9 +76,11 @@ class ScopeVal : public Node {
 
 class NumVal : public Node {
     int val;
+    std::string str;
     public:
-        NumVal(char * strNum) : val(CharPointerToInt(strNum)) {}
+        NumVal(char * strNum) : val(CharPointerToInt(strNum)) , str(strNum) {}
         int getVal() {return val;}
+        std::string getStr() {return str;}
 };
 
 class IdVal : public Node {

@@ -6,6 +6,4 @@
 
 int CharPointerToInt(char * str);
 
-
-
 #endif

@@ -82,11 +82,17 @@ Node* ExpAction12(Node* node1 , Node* node2 , Node* node3);
 // Exp -> NOT Exp
 Node* ExpAction13(Node* node1 , Node* node2);
 
-void CallToEnterScope(SymbolTable& symTable);
+void CallToEnterGlobalScope(SymbolTable& symTable);
 
-void CallToExitScope(SymbolTable& symTable);
+void CallToExitGlobalScope(SymbolTable& symTable);
 
-void CallToExitScope(SymbolTable& symTable , Node* paraList);
+void CallToEnterFunctionScope(SymbolTable& symTable);
+
+void CallToExitFunctionScope(SymbolTable& symTable);
+
+void CallToEnterInnerScope(SymbolTable& symTable);
+
+void CallToExitInnerScope(SymbolTable& symTable);
 
 void EnterWhile(int &in_while_flag);
 
@@ -98,13 +104,15 @@ void CallToExitScopeWithPreConds(SymbolTable& symTable , Node* node1 , Node* nod
 
 void addFunction(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3 ,
         Node* node4 , Node* node5 , Node* node6 , Node* node7);
-
-void CallToPrintIDsInScope(SymbolTable& symTable , Node * paraList);
-
-void CallToPrintIDsInScope(SymbolTable& symTable);
-
-void checkMainRetValueAndParam(Node* node1, Node* node2, Node* node3);
-
+        
 void checkIfBoolInWhileIf(Node* node);
+
+void printIDsInGlobalScope(SymbolTable& symTable);
+
+void printIDsInFunctionScope(SymbolTable& symTable);
+
+void printIDsInInnerScope(SymbolTable& symTable);
+
+void mainCheck(SymbolTable& symTable);
 
 #endif

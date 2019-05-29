@@ -51,9 +51,10 @@ std::vector<string> ParaListToStrings(std::list<TypeNameEnum> paraList){
         TypeNameEnum type = paraList.front();
         std::string currPar = ""; 
         switch(type){
-            case TYPE_INT: currPar="int"; break;
-            case TYPE_BYTE: currPar="byte"; break;
-            case TYPE_BOOL: currPar="bool"; break;
+            case TYPE_INT: currPar="INT"; break;
+            case TYPE_BYTE: currPar="BYTE"; break;
+            case TYPE_BOOL: currPar="BOOL"; break;
+            case TYPE_STR: currPar="STRING"; break;
         }
         vec.push_back(currPar);
         paraList.pop_front();
@@ -68,6 +69,7 @@ std::string TypeToString(TypeNameEnum type){
             case TYPE_BYTE: return std::string("BYTE"); break;
             case TYPE_BOOL: return std::string("BOOL"); break;
             case TYPE_STR: return std::string("STRING"); break;
+            case TYPE_VOID: return std::string("VOID"); break;
             }
     return "none";
 }
