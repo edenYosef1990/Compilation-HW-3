@@ -1,13 +1,13 @@
 #include "attributes.h"
 #include "output.hpp"
-
+#include <stdlib.h> 
 extern int yylineno;
 
 bool IsItConstOrExistingSymbol(DataObj * dataObject){
     if(!(dataObject->IsItVar())){
         return true;
     }
-    if(dynamic_cast<IDNotExists*>(dataObject)!=nullptr){
+    if(dynamic_cast<IDNotExists*>(dataObject)!=NULL){
         return true;
     }
     return false;
@@ -21,7 +21,7 @@ Node* TypeNameToExp(TypeNameEnum type){
             case TYPE_BOOL: return new NonTermBool(); break;
             case TYPE_STR: return new NonTermStr(); break;
         }
-    return nullptr;  
+    return NULL;  
 }
 
 TypeNameEnum TypeNameToTypeEnum(Node * node){
@@ -30,16 +30,16 @@ TypeNameEnum TypeNameToTypeEnum(Node * node){
 }
 
 TypeNameEnum ExpToTypeName(Node * node){
-    if(dynamic_cast<NonTermBool*>(node)!= nullptr){
+    if(dynamic_cast<NonTermBool*>(node)!= NULL){
         return TYPE_BOOL;
     }
-    else if(dynamic_cast<NonTermInt*>(node)!= nullptr){
+    else if(dynamic_cast<NonTermInt*>(node)!= NULL){
         return TYPE_INT;
     }
-    else if(dynamic_cast<NonTermStr*>(node)!= nullptr){
+    else if(dynamic_cast<NonTermStr*>(node)!= NULL){
         return TYPE_STR;
     }
-    else if(dynamic_cast<NonTermByte*>(node)!= nullptr){
+    else if(dynamic_cast<NonTermByte*>(node)!= NULL){
         return TYPE_BYTE;
     }
     return TYPE_NONEXIST;

@@ -14,7 +14,7 @@ using namespace std;
 class Node {
     public:
     Node(){}
-    virtual ~Node() = default;
+    virtual ~Node() {}
 };
 
 //======================================token's Classes=====================================//
@@ -111,7 +111,7 @@ class DataObj : public Node {
             IsVar = false;
         }
         bool IsItVar() {return IsVar;}
-        virtual ~DataObj() = default;
+        virtual ~DataObj() {}
 };
 
 class NonTermBool : public DataObj {
@@ -195,7 +195,7 @@ class PreCondListObj : public Node {
     int numCond;
     public:
         PreCondListObj(PreCondListObj * oldPreCondList) {
-            if(oldPreCondList!=nullptr){
+            if(oldPreCondList!=NULL){
                 numCond=(oldPreCondList->numCond) + 1;
             }
             else{

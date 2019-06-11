@@ -1,6 +1,6 @@
 #include "SemanticActions.h"
 #include "output.hpp"
-
+#include <stdlib.h> 
 // RetType -> TYPE 
 
 Node * RetTypeAction1(Node * node1){
@@ -45,7 +45,7 @@ Node * FormalDeclAction1(SymbolTable& symTable , Node * node1 , Node * node2){
     TypeNameEnum type = TypeNameToTypeEnum(node1);
     std::string name = (dynamic_cast<IdVal*>(node2))->GetVal();
     Symbol* sym = symTable.GetSymbol(name);
-    if(sym != nullptr){
+    if(sym != NULL){
         output::errorDef(yylineno,name); // already exists!
         exit(0);
       //  yyerror("error!");
@@ -56,7 +56,7 @@ Node * FormalDeclAction1(SymbolTable& symTable , Node * node1 , Node * node2){
 // PreConditions -> epsilon
 
 Node* PreConditionsAction1() {
-    return nullptr;
+    return NULL;
 }
 
 // PreConditions -> PreConditions PreCondition
@@ -80,7 +80,7 @@ void PreConditionAction1(Node* node1 , Node* node2 , Node* node3 , Node* node4) 
 void StatmentAction1(SymbolTable& symTable , Node* node1 , Node* node2, Node* node3){
     std::string name = (dynamic_cast<IdVal*>(node2))->IdStr;
     Symbol* sym = symTable.GetSymbol(name);
-    if(sym != nullptr){
+    if(sym != NULL){
         output::errorDef(yylineno,(dynamic_cast<IdVal*>(node2))->IdStr); // already exists in the symbol table
         exit(0);
         //yyerror("");
@@ -95,7 +95,7 @@ void StatmentAction2(SymbolTable& symTable , Node* node1 , Node* node2, Node* no
     std::string name = (dynamic_cast<IdVal*>(node2))->IdStr;
     Symbol* sym = symTable.GetSymbol(name);
     
-    if(sym != nullptr){
+    if(sym != NULL){
         output::errorDef(yylineno,(dynamic_cast<IdVal*>(node2))->IdStr); // alrady exists in the symbol table
         exit(0);
         //yyerror("");
@@ -114,7 +114,7 @@ void StatmentAction2(SymbolTable& symTable , Node* node1 , Node* node2, Node* no
 void StatmentAction3(SymbolTable& symTable , Node* node1 , Node* node2, Node* node3, Node* node4){
     std::string name = (dynamic_cast<IdVal*>(node1))->IdStr;
     Symbol* sym = symTable.GetSymbol(name);
-    if(sym == nullptr){
+    if(sym == NULL || sym->GetType() == TYPE_FUNC){
         output::errorUndef(yylineno, (dynamic_cast<IdVal*>(node1))->IdStr); // not exists in the symbol table
         exit(0);
         //yyerror("error!");
@@ -215,7 +215,7 @@ bool AreParaListsEqual(std::list<TypeNameEnum> list1 , std::list<TypeNameEnum> l
 
 Node* CallAction1(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3 , Node* node4){
     Symbol * sym = symTable.GetSymbol((dynamic_cast<IdVal*>(node1))->IdStr);
-    if(sym == nullptr || sym->GetType() != TYPE_FUNC ){
+    if(sym == NULL || sym->GetType() != TYPE_FUNC ){
         output::errorUndefFunc(yylineno,(dynamic_cast<IdVal*>(node1))->IdStr);
         exit(0);
     }
@@ -247,7 +247,7 @@ Node* CallAction1(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node
 
 Node* CallAction2(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3){
     Symbol * sym = symTable.GetSymbol((dynamic_cast<IdVal*>(node1))->IdStr);
-    if(sym == nullptr || sym->GetType() != TYPE_FUNC ){
+    if(sym == NULL || sym->GetType() != TYPE_FUNC ){
         output::errorUndefFunc(yylineno,(dynamic_cast<IdVal*>(node1))->IdStr);
         exit(0);
         //yyerror("error!");
@@ -260,7 +260,8 @@ Node* CallAction2(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node
         exit(0);
         //yyerror("error!");
     }
-    return TypeNameToExp(sym->GetType());
+    FunctionSymbol* funcSym = dynamic_cast<FunctionSymbol*>(sym);
+    return TypeNameToExp(funcSym->GetRetType());
 }
 
 // Type -> INT
@@ -316,7 +317,7 @@ Node* ExpAction2(Node* node1 , Node* node2 , Node* node3){
 Node* ExpAction3(SymbolTable& symTable , Node* node1){
     std::string name = (dynamic_cast<IdVal*>(node1))->GetVal();
     Symbol* sym = symTable.GetSymbol(name);
-    if(sym == nullptr){
+    if(sym == NULL){
         output::errorUndef(yylineno,name);
         exit(0);
         //yyerror("no such variable!");
@@ -468,15 +469,15 @@ void addFunction(SymbolTable& symTable , Node* node1 , Node* node2 , Node* node3
             TypeNameEnum type = (dynamic_cast<Type*>(node1))->name;
     std::string name = (dynamic_cast<IdVal*>(node2))->GetVal();
     Symbol * sym = symTable.GetSymbol(name);
-    if(sym!=nullptr){
+    if(sym!=NULL){
         output::errorDef(yylineno,name);
         exit(0);
     }
-    int num = (node7 != nullptr) ? (dynamic_cast<PreCondListObj*>(node7))->GetNumCond() : 0;
+    int num = (node7 != NULL) ? (dynamic_cast<PreCondListObj*>(node7))->GetNumCond() : 0;
     std::list<TypeNameEnum> typesList = (dynamic_cast<ParaListObj*>(node5))->GetParaList();
     //typesList.reverse();
     if(name=="main"){
-        if(num==0 && typesList.size()==0 && type==TYPE_VOID){
+        if(typesList.size()==0 && type==TYPE_VOID){
             symTable.FoundMainFunc();
         }
         // else {

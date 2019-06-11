@@ -43,7 +43,6 @@ continue          				{yylval = new CmdWord(CMD_CONTINUE); return CONTINUE;}
 \"([^\n\r\"\\]|\\[rnt"\\])+\"   {yylval = new StrVal(yytext); return STRING;}
 \/\/[^\r\n]*[\r|\n|\r\n]?    	{yylval = new StrVal(yytext); return COMMENT;}
 {whitespace}					;
-\n								;
 \r								;
 \r\n							;
 <<EOF>>							{return ENDFILE;}

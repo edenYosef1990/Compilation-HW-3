@@ -6,6 +6,7 @@
 #include "string"
 #include "typeEnums.h"
 #include <iostream>
+#include <stdlib.h> 
 
 using namespace std;
 
@@ -17,17 +18,15 @@ class Symbol {
         Symbol(std::string _symbolName , int _symbolIndex , TypeNameEnum type) : SymbolName(_symbolName) , SymbolIndex(_symbolIndex) , Type(type) {
             
         }
-          Symbol(const Symbol& Sym) = default;
         std::string GetName() {return SymbolName;}
         int GetIndex() {return SymbolIndex;}
         TypeNameEnum GetType() {return Type;}
-        virtual ~Symbol() = default;
+        virtual ~Symbol() {}
 };
 
 class VariableSymbol : public Symbol {
     public:
     VariableSymbol(std::string _symbolName , int _symbolIndex , TypeNameEnum type) : Symbol(_symbolName,_symbolIndex,type) {}
-    VariableSymbol(const VariableSymbol& varSym) = default;
 };
 
 class FunctionSymbol : public Symbol {
@@ -38,7 +37,6 @@ class FunctionSymbol : public Symbol {
         FunctionSymbol(std::string _symbolName , int _symbolIndex , TypeNameEnum type ,
          std::list<TypeNameEnum> parametersList , TypeNameEnum retType , int precondNum) : 
             Symbol(_symbolName,_symbolIndex,type) , ParametersList(parametersList) , RetType(retType) , PrecondNum(precondNum) {}
-        FunctionSymbol(const FunctionSymbol& varSym) = default;
         std::list<TypeNameEnum> GetParametersList() {return ParametersList;}
         TypeNameEnum GetRetType() {return RetType;}
         int GetPreCondNum() { return PrecondNum;}
@@ -47,7 +45,7 @@ class FunctionSymbol : public Symbol {
 class SymbolTable {
     bool isThereMain;
     TypeNameEnum CurrentRetType;
-    std::list<std::list<Symbol*>> ScopesList;
+    std::list<std::list<Symbol*> > ScopesList;
     int CurrentScopeLevel;
     int CurrentIndexInScope;
     public:

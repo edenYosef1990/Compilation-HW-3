@@ -1,5 +1,5 @@
 #include "SymbolTable.h"
-
+#include <stdlib.h> 
 SymbolTable::SymbolTable() : isThereMain(false), CurrentRetType(TYPE_NONEXIST) , ScopesList(), CurrentScopeLevel(0) ,CurrentIndexInScope(0) {
     ScopesList.push_back(std::list<Symbol*>());
     std::list<TypeNameEnum> typesList1 = std::list<TypeNameEnum>();
@@ -62,18 +62,18 @@ bool SymbolTable::IsMainExists(){
 }
 
 Symbol* SymbolTable::GetSymbol(std::string name){
-    for(std::list<std::list<Symbol*>>::iterator it_scopes = ScopesList.begin() ; 
+    for(std::list<std::list<Symbol*> >::iterator it_scopes = ScopesList.begin() ; 
         it_scopes != ScopesList.end() ; it_scopes++){
             for(std::list<Symbol*>::iterator it_scope = it_scopes->begin() ; 
                 it_scope != it_scopes->end() ; it_scope++) {
                     if((*it_scope)->GetName() == name){
                         Symbol* ptr = (*it_scope);
-                        if(dynamic_cast<VariableSymbol*>(ptr) != nullptr){
+                        if(dynamic_cast<VariableSymbol*>(ptr) != NULL){
                             VariableSymbol * varPtr = dynamic_cast<VariableSymbol*>(ptr);
                             Symbol * copiedSymbolPtr = new VariableSymbol(*varPtr);
                             return copiedSymbolPtr; 
                         }
-                        else if(dynamic_cast<FunctionSymbol*>(ptr) != nullptr){
+                        else if(dynamic_cast<FunctionSymbol*>(ptr) != NULL){
                             FunctionSymbol * funcPtr = dynamic_cast<FunctionSymbol*>(ptr);
                             Symbol * copiedSymbolPtr = new FunctionSymbol(*funcPtr); 
                             return copiedSymbolPtr;
@@ -81,11 +81,11 @@ Symbol* SymbolTable::GetSymbol(std::string name){
                     }
                 }
         }
-    return nullptr;
+    return NULL;
 }
 
 void SymbolTable::printTable(){
-     for(std::list<std::list<Symbol*>>::iterator it_scopes = ScopesList.begin() ; 
+     for(std::list<std::list<Symbol*> >::iterator it_scopes = ScopesList.begin() ; 
         it_scopes != ScopesList.end() ; it_scopes++){
             for(std::list<Symbol*>::iterator it_scope = it_scopes->begin() ; 
                 it_scope != it_scopes->end() ; it_scope++) {
@@ -100,7 +100,7 @@ std::list<Symbol*> SymbolTable::GetCurrentScope(){
 
 int SymbolTable::GetNCurrIndexInMem(){
     int numOfVars = 0;
-    std::list<std::list<Symbol*>>::iterator it = ScopesList.begin();
+    std::list<std::list<Symbol*> >::iterator it = ScopesList.begin();
     int tmp = (*it).size();
     for(it = ScopesList.begin();
     it != ScopesList.end() ; it++){

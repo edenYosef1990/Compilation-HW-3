@@ -3,7 +3,7 @@
 
 #include "attributes.h"
 #include "SymbolTable.h"
-
+#include <stdlib.h> 
 extern int yylineno;
 extern Node* yylval;
 

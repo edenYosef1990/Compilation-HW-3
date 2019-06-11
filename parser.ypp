@@ -5,7 +5,6 @@
     #include "output.hpp"
 	#include <iostream>
 	#include <stdlib.h>
-
 	using namespace std;
 
 	extern int yylex();
@@ -96,9 +95,10 @@ PreCondition :
 	PRECOND LPAREN Exp RPAREN { PreConditionAction1($1,$2,$3,$4);}
 ;
 Statements : 
-    Statement | Statements Statement | Statements COMMENT // dont need to do anything right now
+    Statement | Statements Statement // dont need to do anything right now
 ;
 Statement : 
+    COMMENT                                                                                                                                 |
     LBRACE {CallToEnterInnerScope(globalSymbolTable);} Statements {CallToExitInnerScope(globalSymbolTable);} RBRACE                         | 
     Type ID SC               {StatmentAction1(globalSymbolTable,$1,$2,$3);}                                                                 | 
     Type ID ASSIGN Exp SC    {StatmentAction2(globalSymbolTable ,$1,$2,$3,$4,$5);}                                                          | 
